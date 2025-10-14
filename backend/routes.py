@@ -30,7 +30,7 @@ def init_app(app):
         session.add(new_user)
         session.commit()
         session.close()
-        return "<script>alert("success :)"); window.location.href="/signup";</script>"
+        return "<script>alert('success!!'); window.location.href='/signup';</script>"
 
     @app.route("/signup")
     def signup():
