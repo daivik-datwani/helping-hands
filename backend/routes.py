@@ -1,8 +1,8 @@
 from flask import *
 from backend.db import SessionLocal
-from backend.models.thedatabaseidk import Senior as User
-from backend.models.thedatabaseidk import Caretaker as Caretaker
-from backend.models.thedatabaseidk import Request as RequestModel  
+from backend.models.helpinghandsdatabase import Senior as User
+from backend.models.helpinghandsdatabase import Caretaker as Caretaker
+from backend.models.helpinghandsdatabase import Request as RequestModel  
 
 def init_app(app):
     @app.route("/")
