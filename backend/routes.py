@@ -1,6 +1,8 @@
 from flask import *
 from backend.db import SessionLocal
-from backend.models.thedatabaseidk import User
+from backend.models.thedatabaseidk import Senior as User
+from backend.models.thedatabaseidk import Caretaker as Caretaker
+from backend.models.thedatabaseidk import Request as RequestModel  
 
 def init_app(app):
     @app.route('/')
@@ -10,9 +12,11 @@ def init_app(app):
     @app.route('/users', methods=['GET'])
     def get_data():
         session = SessionLocal()
-        users = session.query(User).all()
+        try:
+            users = session.query(User).all()
+        finally:
+            session.close()
         data = [{"Senior": u.name, "Age": u.age, "Contact": u.phoneemail} for u in users]
-        session.close()
         return jsonify(data)
     
     @app.route('/users', methods=['POST'])
