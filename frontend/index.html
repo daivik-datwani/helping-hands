@@ -125,6 +125,17 @@
 					if(togg) togg.setAttribute('aria-expanded', 'false');
 				});
 			});
+
+					// sticky header: add scrolled class when page scrolls
+					const header = document.querySelector('.site-header');
+					const SCROLL_THRESHOLD = 24;
+					const onScroll = () => {
+						if(window.scrollY > SCROLL_THRESHOLD) header.classList.add('scrolled');
+						else header.classList.remove('scrolled');
+					};
+					window.addEventListener('scroll', onScroll, {passive:true});
+					// initialize
+					onScroll();
 		</script>
 	</body>
 </html>
