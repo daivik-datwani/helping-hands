@@ -31,7 +31,18 @@ def init_app(app):
         session.commit()
         session.close()
         return "<script>alert('success!!'); window.location.href='/signup';</script>"
-
+    
+    @app.route("/signup.html")
     @app.route("/signup")
     def signup():
         return render_template("signup.html")
+
+    @app.route("/login.html")
+    @app.route("/login")
+    def login():
+        return render_template("login.html")
+
+    @app.route("/<path:filename>")
+    def serve_static(filename):
+        return send_from_directory('frontend', filename)
+
