@@ -1,4 +1,4 @@
-<html><head>
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -10,7 +10,7 @@
   <body>
     <header class="site-header">
       <div class="container nav-row">
-        <a href="index.html" class="logo"><span class="logo-mark">🤝</span><span class="logo-text">Helping Hands</span></a>
+        <a href="{{ url_for('home') }}" class="logo"><span class="logo-mark">🤝</span><span class="logo-text">Helping Hands</span></a>
       </div>
     </header>
 
@@ -36,7 +36,7 @@
             <button class="btn primary" type="submit">Create account</button>
           </form>
 
-          <p class="small">Already have an account? <a href="login.html">Sign in</a></p>
+          <p class="small">Already have an account? <a href="{{ url_for('login') }}">Sign in</a></p>
         </div>
       </section>
     </main>

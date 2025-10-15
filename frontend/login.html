@@ -9,7 +9,7 @@
 	<body>
 		<header class="site-header">
 			<div class="container nav-row">
-				<a href="index.html" class="logo"><span class="logo-mark">🤝</span><span class="logo-text">Helping Hands</span></a>
+				<a href="{{ url_for('home') }}" class="logo"><span class="logo-mark">🤝</span><span class="logo-text">Helping Hands</span></a>
 			</div>
 		</header>
 
@@ -36,7 +36,7 @@
 						<button class="btn primary" type="submit">Sign in</button>
 					</form>
 
-					<p class="small">New here? <a href="signup.html">Create an account</a></p>
+					<p class="small">New here? <a href="{{ url_for('signup') }}">Create an account</a></p>
 				</div>
 			</section>
 		</main>
