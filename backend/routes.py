@@ -8,33 +8,7 @@ def init_app(app):
     @app.route("/")
     def home():
         return render_template("index.html")
-    
-    @app.route("/users", methods=["GET"])
-    def get_data():
-        session = SessionLocal()
-        try:
-            users = session.query(User).all()
-        finally:
-            session.close()
-        data = [{"Senior": u.name, "Age": u.age, "Email": u.email, "Phone": u.phone, "Password": u.password} for u in users]
-        return jsonify(data)
 
-    @app.route("/users", methods=["POST"])
-    def post_data():
-        name = request.form.get("name")
-        age = request.form.get("age")
-        email = request.form.get("email")
-        phone = request.form.get("phone")
-        password = request.form.get("password")
-
-        session = SessionLocal()
-        new_user = User(name=name, age=age, email=email, phone=phone, password=password)
-        session.add(new_user)
-        session.commit()
-        session.close()
-        # after successful signup, redirect to the login page
-        return redirect(url_for('login'))
-    
     @app.route("/signup.html")
     @app.route("/signup")
     def signup():
@@ -50,29 +24,62 @@ def init_app(app):
     def signup_caretaker():
         return render_template("signup_caretaker.html")
 
-    @app.route("/caretakers", methods=["POST"])
-    def post_caretaker():
-        name = request.form.get("name")
-        age = request.form.get("age")
-        phoneemail = request.form.get("phoneemail")
-        session = SessionLocal()
-        new_c = Caretaker(name=name, age=age, phoneemail=phoneemail)
-        session.add(new_c)
-        session.commit()
-        session.close()
-        return redirect(url_for('login_caretaker'))
-
     @app.route("/login.html")
     @app.route("/login")
     def login():
         return render_template("login.html")
+    
+    @app.route("/users", methods=["GET"])
+    def get_seniors():
+        session = SessionLocal()
+        try:
+            users = session.query(User).all()
+        finally:
+            session.close()
+        data = [{"Senior": u.name, "Age": u.age, "Email": u.email, "Phone": u.phone, "Password": u.password} for u in users]
+        return jsonify(data)
 
-    @app.route("/login", methods=["POST"])
-    def login_post():
-        # Very small placeholder login handler. In production, validate credentials.
-        email = request.form.get('email')
-        # For now, just redirect to home after "login" to avoid 404s.
-        return redirect(url_for('home'))
+    @app.route("/users", methods=["POST"])
+    def post_seniors():
+        name = request.form.get("name")
+        age = request.form.get("age")
+        email = request.form.get("email")
+        phone = request.form.get("phone")
+        password = request.form.get("password")
+
+        session = SessionLocal()
+        new_user = User(name=name, age=age, email=email, phone=phone, password=password)
+        session.add(new_user)
+        session.commit()
+        session.close()
+        # after successful signup, redirect to the login page
+        return redirect(url_for('login_senior'))
+
+    @app.route("/caretakers", methods=["GET"])
+    def get_cs():
+        session = SessionLocal()
+        try:
+            cs = session.query(Caretaker).all()
+        finally:
+            session.close()
+        data = [{"Caretaker": u.name, "Age": u.age, "Email": u.email, "Phone": u.phone, "Password": u.password} for u in cs]
+        return jsonify(data)
+    
+    @app.route("/caretakers", methods=["POST"])
+    def post_cs():
+        name = request.form.get("name")
+        age = request.form.get("age")
+        email = request.form.get("email")
+        phone = request.form.get("phone")
+        password = request.form.get("password")
+
+        session = SessionLocal()
+        new_c = Caretaker(name=name, age=age, email=email, phone=phone, password=password)
+        session.add(new_c)
+        session.commit()
+        session.close()
+        # after successful signup, redirect to the login page
+        return redirect(url_for('login_caretaker'))
 
     @app.route('/login_senior', methods=["GET", "POST"])
     def login_senior():

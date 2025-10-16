@@ -17,21 +17,39 @@
       <section class="auth-page" style="padding:64px 0">
         <div class="auth-card">
           <h1>Sign up as a Caretaker</h1>
-          <p class="muted">Create an account to offer help and accept requests.</p>
+          <p class="muted">Create an account so you can request help.</p>
 
-          <form action="/caretakers" method="post" class="form">
+
+          <form action="/caretakers" method="post" class="form" id="form">
             <label for="name">Full name</label>
             <input id="name" name="name" type="text" required autocomplete="name" />
 
             <label for="age">Age</label>
             <input id="age" name="age" type="number" required min="18" />
 
-            <label for="phoneemail">Phone or email (contact)</label>
-            <input id="phoneemail" name="phoneemail" type="text" autocomplete="tel" />
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" />
 
-            <button class="btn primary" type="submit">Create caretaker account</button>
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" />
+
+            <label for="password">Password (optional)</label>
+            <input id="password" name="password" type="password" autocomplete="new-password" />
+
+            <button class="btn primary" type="submit">Create account</button>
           </form>
 
+          <script>
+            document.getElementById("form").addEventListener("submit", function(e) {
+            const f1 = document.getElementById("phone").value.trim();
+            const f2 = document.getElementById("email").value.trim();
+
+            if (!f1 && !f2) {
+              e.preventDefault();
+              alert("Please fill email or phone.");
+            }
+          });
+          </script>
           <p class="small">Are you a senior? <a href="signup_senior.html">Sign up as a senior</a></p>
         </div>
       </section>
