@@ -7,8 +7,10 @@ class Senior(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
+    email = Column(String)
+    phone = Column(String)
     age = Column(Integer)
-    phoneemail = Column(String)
+    password = Column(String)
 
     requests = relationship("Request", back_populates="senior")
 

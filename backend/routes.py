@@ -16,17 +16,19 @@ def init_app(app):
             users = session.query(User).all()
         finally:
             session.close()
-        data = [{"Senior": u.name, "Age": u.age, "Contact": u.phoneemail} for u in users]
+        data = [{"Senior": u.name, "Age": u.age, "Email": u.email, "Phone": u.phone, "Password": u.password} for u in users]
         return jsonify(data)
 
     @app.route("/users", methods=["POST"])
     def post_data():
         name = request.form.get("name")
         age = request.form.get("age")
-        phoneemail = request.form.get("phoneemail")
+        email = request.form.get("email")
+        phone = request.form.get("phone")
+        password = request.form.get("password")
 
         session = SessionLocal()
-        new_user = User(name=name, age=age, phoneemail=phoneemail)
+        new_user = User(name=name, age=age, email=email, phone=phone, password=password)
         session.add(new_user)
         session.commit()
         session.close()
@@ -50,6 +52,7 @@ def init_app(app):
         # For now, just redirect to home after "login" to avoid 404s.
         return redirect(url_for('home'))
 
+    # this code makes url allow no file extension
     @app.route("/<path:filename>")
     def serve_static(filename):
         return send_from_directory('frontend', filename)
