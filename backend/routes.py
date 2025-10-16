@@ -30,7 +30,8 @@ def init_app(app):
         session.add(new_user)
         session.commit()
         session.close()
-        return "<script>alert('success!!'); window.location.href='/signup';</script>"
+        # after successful signup, redirect to the login page
+        return redirect(url_for('login'))
     
     @app.route("/signup.html")
     @app.route("/signup")
@@ -41,6 +42,13 @@ def init_app(app):
     @app.route("/login")
     def login():
         return render_template("login.html")
+
+    @app.route("/login", methods=["POST"])
+    def login_post():
+        # Very small placeholder login handler. In production, validate credentials.
+        email = request.form.get('email')
+        # For now, just redirect to home after "login" to avoid 404s.
+        return redirect(url_for('home'))
 
     @app.route("/<path:filename>")
     def serve_static(filename):

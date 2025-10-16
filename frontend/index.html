@@ -9,7 +9,7 @@
 	<body>
 		<header class="site-header">
 			<div class="container nav-row">
-				<a href="#" class="logo" aria-label="Helping Hands home">
+						<a href="{{ url_for('home') }}" class="logo" aria-label="Helping Hands home">
 					<span class="logo-mark">🤝</span>
 					<span class="logo-text">Helping Hands</span>
 				</a>
@@ -28,8 +28,8 @@
 				</nav>
 
 				<div class="auth-actions">
-					<a class="btn ghost" href="login">Login</a>
-					<a class="btn primary" href="signup">Sign Up</a>
+					  <a class="btn ghost" href="{{ url_for('login') }}">Login</a>
+					  <a class="btn primary" href="{{ url_for('signup') }}">Sign Up</a>
 				</div>
 			</div>
 		</header>
