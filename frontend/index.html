@@ -46,9 +46,10 @@
 						</div>
 					</div>
 
-					<div class="hero-visual" role="img" aria-label="Friendly helper assisting seniors">
-						<img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=60" alt="A friendly helper assisting seniors"/>
-					</div>
+								<div class="hero-visual" role="img" aria-label="Friendly helper assisting seniors">
+									<!-- Local hero image (place the attached image at frontend/assets/hero.jpg) -->
+									<img id="heroImage" src="assets/hero.jpg" alt="A smiling helper with a senior in a wheelchair at sunset"/>
+								</div>
 				</div>
 			</section>
 
@@ -136,6 +137,14 @@
 					window.addEventListener('scroll', onScroll, {passive:true});
 					// initialize
 					onScroll();
+
+							// hero image fallback: if local image fails to load, use the external Unsplash image
+							const heroImage = document.getElementById('heroImage');
+							if(heroImage){
+								heroImage.addEventListener('error', () => {
+									heroImage.src = 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=60';
+								});
+							}
 		</script>
 	</body>
 </html>
