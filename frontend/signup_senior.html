@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sign up — Senior</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-row">
+        <a href="{{ url_for('home') }}" class="logo"><span class="logo-mark">🤝</span><span class="logo-text">Helping Hands</span></a>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="auth-page" style="padding:64px 0">
+        <div class="auth-card">
+          <h1>Sign up as a Senior</h1>
+          <p class="muted">Create an account so you can request help.</p>
+
+
+          <form action="/users" method="post" class="form" id="form">
+            <label for="name">Full name</label>
+            <input id="name" name="name" type="text" required autocomplete="name" />
+
+            <label for="age">Age</label>
+            <input id="age" name="age" type="number" required min="60" />
+
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" />
+
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" />
+
+            <label for="password">Password (optional)</label>
+            <input id="password" name="password" type="password" autocomplete="new-password" />
+
+            <button class="btn primary" type="submit">Create account</button>
+          </form>
+
+          <script>
+            document.getElementById("form").addEventListener("submit", function(e) {
+            const f1 = document.getElementById("phone").value.trim();
+            const f2 = document.getElementById("email").value.trim();
+
+            if (!f1 && !f2) {
+              e.preventDefault();
+              alert("Please fill email or phone.");
+            }
+          });
+          </script>
+          <p class="small">Are you a caretaker? <a href="signup_caretaker.html">Sign up as a caretaker</a></p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

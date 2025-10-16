@@ -40,6 +40,28 @@ def init_app(app):
     def signup():
         return render_template("signup.html")
 
+    @app.route("/signup_senior")
+    @app.route("/signup_senior.html")
+    def signup_senior():
+        return render_template("signup_senior.html")
+
+    @app.route("/signup_caretaker")
+    @app.route("/signup_caretaker.html")
+    def signup_caretaker():
+        return render_template("signup_caretaker.html")
+
+    @app.route("/caretakers", methods=["POST"])
+    def post_caretaker():
+        name = request.form.get("name")
+        age = request.form.get("age")
+        phoneemail = request.form.get("phoneemail")
+        session = SessionLocal()
+        new_c = Caretaker(name=name, age=age, phoneemail=phoneemail)
+        session.add(new_c)
+        session.commit()
+        session.close()
+        return redirect(url_for('login_caretaker'))
+
     @app.route("/login.html")
     @app.route("/login")
     def login():
@@ -51,6 +73,18 @@ def init_app(app):
         email = request.form.get('email')
         # For now, just redirect to home after "login" to avoid 404s.
         return redirect(url_for('home'))
+
+    @app.route('/login_senior', methods=["GET", "POST"])
+    def login_senior():
+        if request.method == 'POST':
+            return redirect(url_for('home'))
+        return render_template('login_senior.html')
+
+    @app.route('/login_caretaker', methods=["GET", "POST"])
+    def login_caretaker():
+        if request.method == 'POST':
+            return redirect(url_for('home'))
+        return render_template('login_caretaker.html')
 
     # this code makes url allow no file extension
     @app.route("/<path:filename>")
