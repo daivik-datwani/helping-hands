@@ -19,22 +19,11 @@
 					<h1>Welcome back</h1>
 					<p class="muted">Sign in to request help or manage your account.</p>
 
-					<form action="/login" method="post" class="form">
-						<label for="email">Email</label>
-						<input id="email" name="email" type="email" required autocomplete="email" />
-
-						<label for="password">Password</label>
-						<input id="password" name="password" type="password" required autocomplete="current-password" />
-
-						<div class="form-row">
-							<label class="checkbox">
-								<input type="checkbox" name="remember" /> Remember me
-							</label>
-							<a class="muted small" href="#">Forgot password?</a>
-						</div>
-
-						<button class="btn primary" type="submit">Sign in</button>
-					</form>
+					<div class="form">
+						<p class="muted">Sign in as:</p>
+						<a class="btn primary" href="{{ url_for('login_senior') }}">Senior</a>
+						<a class="btn ghost" href="{{ url_for('login_caretaker') }}">Caretaker</a>
+					</div>
 
 					<p class="small">New here? <a href="{{ url_for('signup') }}">Create an account</a></p>
 				</div>
