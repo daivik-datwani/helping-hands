@@ -84,13 +84,31 @@ def init_app(app):
     @app.route('/login_senior', methods=["GET", "POST"])
     def login_senior():
         if request.method == 'POST':
-            return redirect(url_for('home'))
+            email = request.form.get("email")
+            password = request.form.get("password")
+            session = SessionLocal()
+            try:
+                user = session.query(User).filter_by(email=email).first()
+            finally:
+                session.close()
+            if user and user.password == password:
+                return redirect(url_for('home')) #change to dashboard later
+            return render_template('login_senior.html', error="Invalid email or password")
         return render_template('login_senior.html')
 
     @app.route('/login_caretaker', methods=["GET", "POST"])
     def login_caretaker():
         if request.method == 'POST':
-            return redirect(url_for('home'))
+            email = request.form.get("email")
+            password = request.form.get("password")
+            session = SessionLocal()
+            try:
+                cs = session.query(Caretaker).filter_by(email=email).first()
+            finally:
+                session.close()
+            if cs and cs.password == password:
+                return redirect(url_for('home')) #change to dashboard later
+            return render_template('login_caretaker.html', error="Invalid email or password")
         return render_template('login_caretaker.html')
 
     # this code makes url allow no file extension
