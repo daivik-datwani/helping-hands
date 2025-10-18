@@ -29,22 +29,25 @@ def init_app(app):
     def login():
         return render_template("login.html")
 
+
     @app.route("/login_senior", methods=["GET", "POST"])
     def login_senior():
         if request.method == "POST":
             contact = request.form.get("email")
             password = request.form.get("password")
-            db = SessionLocal()
-            user = None
-            if "@" in contact:
-                user = db.query(Senior).filter_by(email=contact).first()
-            else:
-                user = db.query(Senior).filter_by(phone=contact).first()
-            db.close()
+            session = SessionLocal()
+            try:
+                user = None
+                if email:
+                    user = session.query(User).filter_by(email=email).first()
+                if not user and phone:
+                    user = session.query(User).filter_by(phone=phone).first()
+            finally:
+                session.close()
             if user and check_password_hash(user.password_hash, password):
                 session["user_id"] = user.id
                 session["user_name"] = user.name
-                return redirect(url_for("home"))
+                return redirect(url_for("dashboard"))
             flash("Invalid credentials")
             return redirect(url_for("login_senior"))
         return render_template("login_senior.html")
@@ -54,12 +57,15 @@ def init_app(app):
         if request.method == "POST":
             contact = request.form.get("email")
             password = request.form.get("password")
-            db = SessionLocal()
-            user = None
-            if "@" in contact:
-                user = db.query(Caretaker).filter_by(email=contact).first()
-            else:
-                user = db.query(Caretaker).filter_by(phone=contact).first()
+            session = SessionLocal()
+            try:
+                cs = None
+                if email:
+                    cs = session.query(Caretaker).filter_by(email=email).first()
+                if not user and phone:
+                    cs = session.query(Caretaker).filter_by(phone=phone).first()
+            finally:
+                session.close()
             db.close()
             if user and check_password_hash(user.password_hash, password):
                 session["user_id"] = user.id
@@ -115,49 +121,14 @@ def init_app(app):
         # after successful signup, redirect to the login page
         return redirect(url_for('login_caretaker'))
 
-    @app.route('/login_senior', methods=["GET", "POST"])
-    def login_senior():
-        if request.method == 'POST':
-            email = request.form.get("email")
-            phone = request.form.get("phone")
-            password = request.form.get("password")
-            session = SessionLocal()
-            try:
-                user = None
-                if email:
-                    user = session.query(User).filter_by(email=email).first()
-                if not user and phone:
-                    user = session.query(User).filter_by(phone=phone).first()
-            finally:
-                session.close()
-            if user and user.password == password:
-                return redirect(url_for('home')) #change to dashboard later
-            return render_template('login_senior.html', error="Invalid email or password")
-        return render_template('login_senior.html')
-
-    @app.route('/login_caretaker', methods=["GET", "POST"])
-    def login_caretaker():
-        if request.method == 'POST':
-            email = request.form.get("email")
-            phone = request.form.get("phone")
-            password = request.form.get("password")
-            session = SessionLocal()
-            try:
-                cs = session.query(Caretaker).filter_by(email=email).first()
-            except:
-                try:
-                    cs = session.query(Caretaker).filter_by(phone=phone).first()
-                finally:
-                    session.close()
-            finally:
-                session.close()
-            if cs and cs.password == password:
-                return redirect(url_for('home')) #change to dashboard later
-            return render_template('login_caretaker.html')
-        return render_template('login_caretaker.html')
+    @app.route('/dashboard')
+    def dashboard():
+        username = request.cookies.get('username')
+        if not username:
+            return redirect('/login')
+        return render_template('dashboard.html', username=username)
 
     # this code makes url allow no file extension
-
     @app.route("/<path:filename>")
     def serve_static(filename):
         return send_from_directory('frontend', filename)
