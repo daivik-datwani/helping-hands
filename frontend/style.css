@@ -149,10 +149,10 @@ body{
 
 /* Base font size for accessibility and larger text */
 html {
-  font-size: 18px;
+  font-size: 24px;
 }
 body {
-  font-size: 18px;
+  font-size: 24px;
   font-family: Inter, 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial;
   color: var(--deep-red);
   background: var(--bg);
