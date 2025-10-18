@@ -27,6 +27,7 @@ class Caretaker(Base):
 
     requests = relationship("Request", back_populates="caretaker")
 
+
 class Request(Base):
     __tablename__ = "requests"
 

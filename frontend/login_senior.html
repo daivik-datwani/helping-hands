@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login — Senior</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-row">
+        <a href="{{ url_for('home') }}" class="logo"><span class="logo-mark">🤝</span><span class="logo-text">Helping Hands</span></a>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="auth-page" style="padding:72px 0">
+        <div class="auth-card">
+          <h1>Senior sign in</h1>
+          <p class="muted">Sign in to manage your requests.</p>
+
+          <form action="/login_senior" method="post" class="form">
+            <label for="email">Email or phone</label>
+            <input id="email" name="email" type="text" required autocomplete="email" />
+
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" required autocomplete="current-password" />
+
+            <button class="btn primary" type="submit">Sign in</button>
+          </form>
+
+          <p class="small">Need an account? <a href="signup_senior.html">Sign up as a senior</a></p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
