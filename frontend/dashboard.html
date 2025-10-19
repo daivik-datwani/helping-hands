@@ -1,1 +1,295 @@
-daivik put your code in here please
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senior Dashboard - Helping Hands</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #8FBC8F;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, #6B8E6B, #8FBC8F);
+            border: 3px solid white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome-banner h1 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .profile-info {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .profile-info p {
+            color: white;
+            font-size: 1.3rem;
+            margin: 8px 0;
+            font-weight: 500;
+        }
+
+        /* Main Actions Section */
+        .main-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .action-button {
+            background-color: #6B8E6B;
+            border: 3px solid white;
+            border-radius: 15px;
+            padding: 40px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            background-color: #5A7D5A;
+        }
+
+        .action-button h2 {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-button p {
+            color: white;
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+
+        /* Dashboard Sections */
+        .dashboard-section {
+            background-color: #8FBC8F;
+            border: 3px solid white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-section h2 {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            border-bottom: 2px solid white;
+            padding-bottom: 10px;
+        }
+
+        /* Request Cards */
+        .request-card {
+            background-color: rgba(255, 255, 255, 0.3);
+            border: 2px solid white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .request-card:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+            transform: translateX(5px);
+        }
+
+        .request-card h3 {
+            color: white;
+            font-size: 1.6rem;
+            margin-bottom: 12px;
+        }
+
+        .request-card p {
+            color: white;
+            font-size: 1.2rem;
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+
+        .request-status {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 20px;
+            background-color: white;
+            color: #6B8E6B;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+
+        .status-pending {
+            background-color: #FFD700;
+            color: #333;
+        }
+
+        .status-accepted {
+            background-color: #90EE90;
+            color: #333;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.3rem;
+        }
+
+        /* Logout Button */
+        .logout-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .logout-button {
+            background-color: #DC143C;
+            border: 3px solid white;
+            border-radius: 10px;
+            padding: 15px 40px;
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .logout-button:hover {
+            background-color: #B22222;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .welcome-banner h1 {
+                font-size: 2rem;
+            }
+            
+            .action-button h2 {
+                font-size: 1.6rem;
+            }
+            
+            .dashboard-section h2 {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Welcome Banner with Profile Info -->
+        <div class="welcome-banner">
+            <h1>Welcome back, {{ user.name }}! 👋</h1>
+            <div class="profile-info">
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <p><strong>Phone:</strong> {{ user.phone }}</p>
+                <p><strong>Location:</strong> {{ user.location or 'Not specified' }}</p>
+            </div>
+        </div>
+
+        <!-- Main Action Buttons -->
+        <div class="main-actions">
+            <a href="{{ url_for('request_help') }}" class="action-button">
+                <h2>🆘 Request Help</h2>
+                <p>Need assistance? Create a new help request to connect with available caregivers.</p>
+            </a>
+            
+            <a href="{{ url_for('view_caregivers') }}" class="action-button">
+                <h2>👥 View Caregivers</h2>
+                <p>Browse our network of qualified caregivers and their specialties.</p>
+            </a>
+        </div>
+
+        <!-- Upcoming Requests Section -->
+        <div class="dashboard-section">
+            <h2>📋 Your Upcoming Requests</h2>
+            
+            {% if requests and requests|length > 0 %}
+                {% for request in requests %}
+                <div class="request-card">
+                    <h3>{{ request.service_type }}</h3>
+                    <p><strong>Date:</strong> {{ request.date }}</p>
+                    <p><strong>Time:</strong> {{ request.time }}</p>
+                    <p><strong>Description:</strong> {{ request.description }}</p>
+                    {% if request.caregiver_name %}
+                        <p><strong>Caregiver:</strong> {{ request.caregiver_name }}</p>
+                    {% endif %}
+                    <span class="request-status {{ 'status-accepted' if request.status == 'accepted' else 'status-pending' }}">
+                        {{ request.status|title }}
+                    </span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <p>You have no upcoming requests. Click "Request Help" to create one!</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Caregiver Status Section -->
+        <div class="dashboard-section">
+            <h2>👨‍⚕️ Your Caregivers</h2>
+            
+            {% if caregivers and caregivers|length > 0 %}
+                {% for caregiver in caregivers %}
+                <div class="request-card">
+                    <h3>{{ caregiver.name }}</h3>
+                    <p><strong>Specialization:</strong> {{ caregiver.specialization }}</p>
+                    <p><strong>Experience:</strong> {{ caregiver.experience }} years</p>
+                    <p><strong>Contact:</strong> {{ caregiver.phone }}</p>
+                    {% if caregiver.availability %}
+                        <p><strong>Next Available:</strong> {{ caregiver.next_available }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <p>No caregivers assigned yet. Browse available caregivers to get started!</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Logout Section -->
+        <div class="logout-section">
+            <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
+        </div>
+    </div>
+</body>
+</html>
