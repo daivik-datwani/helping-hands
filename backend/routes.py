@@ -234,6 +234,7 @@ def init_app(app):
             ]
         }
         return jsonify(data)
+
     @app.route("/request_help", methods=["GET", "POST"])
     def request_help():
         user_id = session.get("user_id")
@@ -259,7 +260,7 @@ def init_app(app):
             db.commit()
             db.close()
             flash("Your help request has been submitted!")
-            return redirect(url_for("dashboard_senior"))
+            return redirect(url_for("dashboard"))
         return render_template("request_help.html")
 
     @app.route('/get_senior', methods=['POST'])

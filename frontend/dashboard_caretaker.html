@@ -19,9 +19,6 @@
     <section class="stripe-card" style="margin-top:48px;">
       <h1 class="hero-title">Welcome back, {{ user.name }}! 👋</h1>
       <ul style="font-size:1.15em;line-height:1.6;color:var(--deep-red);margin:28px 0 0 0;padding:0;list-style:none;">
-        <li><strong>ID:</strong> {{ user.id }}</li>
-        <li><strong>Name:</strong> {{ user.name }}</li>
-        <li><strong>Age:</strong> {{ user.age }}</li>
         <li><strong>Email:</strong> {{ user.email }}</li>
         <li><strong>Phone:</strong> {{ user.phone }}</li>
       </ul>
@@ -38,10 +35,10 @@
             <strong>Description:</strong> {{ request.description }}<br>
             {% if request.senior_name %}
               <strong>Senior:</strong>
-              <button onclick="loadSeniorDetails({{ request.senior_id }})">
+              <button onclick="loadSeniorDetails({{ request.senior_id }}, this)">
                 {{ request.senior_name }}
               </button>
-              <div id="senior-details"></div>
+              <div class="senior-details"></div>
               <br>
             {% endif %}
             <strong>Status:</strong> {{ request.status|title }}
@@ -56,26 +53,27 @@
       <a href="/logout" class="btn primary logout-button">Logout</a>
     </div>
     <script>
-    async function loadSeniorDetails(seniorId) {
-      const response = await fetch('/get_senior', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: seniorId })
-      });
-      const data = await response.json();
-      if (data.error) {
-        alert(data.error);
-        return;
-      }
-      const details = document.getElementById('senior-details');
-      details.innerHTML = `
-        <div class="stripe-card">
-          <h3>${data.name}</h3>
-          <p><strong>Age:</strong> ${data.age}</p>
-          <p><strong>Email:</strong> ${data.email}</p>
-          <p><strong>Phone:</strong> ${data.phone}</p>
-        </div>
-      `;
+    async function loadSeniorDetails(seniorId, btn) {
+    const response = await fetch('/get_senior', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: seniorId })
+    });
+    const data = await response.json();
+    if (data.error) {
+      alert(data.error);
+      return;
+    }
+
+    const details = btn.nextElementSibling; // targets the div right after the button
+    details.innerHTML = `
+      <div class="stripe-card">
+        <h3>${data.name}</h3>
+        <p><strong>Age:</strong> ${data.age}</p>
+        <p><strong>Email:</strong> ${data.email}</p>
+        <p><strong>Phone:</strong> ${data.phone}</p>
+      </div>
+    `;
     }
     </script>
   </div>
