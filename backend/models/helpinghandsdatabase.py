@@ -9,9 +9,9 @@ class Senior(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     age = Column(Integer, nullable=False)
-    phone = Column(String, nullable=True)
     email = Column(String, unique=True, nullable=True)
     password_hash = Column(String, nullable=False)
+    phone = Column(String, nullable=True)
 
     requests = relationship("Request", back_populates="senior")
 
