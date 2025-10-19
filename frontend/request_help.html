@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Request Help — Senior</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-row">
+      <a href="{{ url_for('dashboard') }}" class="logo">
+        <span class="logo-mark">🤝</span><span class="logo-text">Helping Hands</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="request-help-page" style="padding:72px 0">
+      <div class="auth-card">
+        <h1>Request Help</h1>
+        <p class="muted">Fill in the details below so a caretaker can assist you.</p>
+
+        <form action="{{ url_for('request_help') }}" method="post" class="form">
+          <label for="title">Title</label>
+          <input id="title" name="title" type="text" required autocomplete="off">
+
+          <label for="description">Description</label>
+          <textarea id="description" name="description" rows="4" required></textarea>
+
+          <label for="category">Category</label>
+          <select id="category" name="category" required>
+            <option value="">-- Select --</option>
+            <option value="Grocery">Grocery</option>
+            <option value="Medical">Medical</option>
+            <option value="Household">Household</option>
+            <option value="Transport">Transport</option>
+            <option value="Other">Other</option>
+          </select>
+
+          <label for="location">Location</label>
+          <input id="location" name="location" type="text" required autocomplete="off">
+
+          <button class="btn primary" type="submit">Submit Request</button>
+        </form>
+
+        <p class="small"><a href="{{ url_for('dashboard') }}">Back to Dashboard</a></p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
