@@ -26,7 +26,7 @@ def init_app(app):
     @app.route("/logout")
     def logout():
         session.clear()
-        return redirect(url_for("login_senior"))
+        return redirect(url_for("login"))
         
     @app.route("/login")
     @app.route("/login.html")
@@ -151,11 +151,12 @@ def init_app(app):
         if not user_id:
             return redirect('/login')
         db = SessionLocal()
-        user = db.query(Senior).filter_by(id=user_id).first()
         if session.get('user_role') == 'senior':
+            user = db.query(Senior).filter_by(id=user_id).first()
             db.close()
             return render_template('dashboard_senior.html', user=user)
         elif session.get('user_role') == 'caretaker':
+            user = db.query(Caretaker).filter_by(id=user_id).first()
             db.close()
             return render_template('dashboard_caretaker.html', user=user)
         db.close()

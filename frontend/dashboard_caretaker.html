@@ -1,1 +1,57 @@
-beans
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Senior Dashboard | Helping Hands</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <div class="nav-row">
+        <a class="logo" href="/">
+          <span class="logo-mark">🤝</span>
+          <span class="logo-text">Helping Hands</span>
+        </a>
+      </div>
+    </header>
+
+    <section class="stripe-card" style="margin-top:48px;">
+      <h1 class="hero-title">Welcome back, {{ user.name }}! 👋</h1>
+      <ul style="font-size:1.15em;line-height:1.6;color:var(--deep-red);margin:28px 0 0 0;padding:0;list-style:none;">
+        <li><strong>ID:</strong> {{ user.id }}</li>
+        <li><strong>Name:</strong> {{ user.name }}</li>
+        <li><strong>Age:</strong> {{ user.age }}</li>
+        <li><strong>Email:</strong> {{ user.email }}</li>
+        <li><strong>Phone:</strong> {{ user.phone }}</li>
+      </ul>
+    </section>
+    <br>
+    <section class="stripe">
+      <h2 class="hero-title" style="font-size:2em;">📋 Your Accepted Requests</h2>
+      <button type="button" class="btn primary" onclick="window.open('/request_help','_self')">Help people idk</button>
+      {% if requests and requests|length > 0 %}
+        <div class="stripe-grid">
+        {% for request in requests %}
+          <div class="stripe-card">
+            <strong>{{ request.service_type }}</strong><br>
+            <strong>Date:</strong> {{ request.date }}<br>
+            <strong>Time:</strong> {{ request.time }}<br>
+            <strong>Description:</strong> {{ request.description }}<br>
+            {% if request.caregiver_name %}
+            <strong>Senior:</strong> {{ request.senior_id }}<br>
+            {% endif %}
+            <strong>Status:</strong> {{ request.status|title }}
+          </div>
+        {% endfor %}
+        </div>
+      {% else %}
+        <p>Accept one please</p>
+      {% endif %}
+    </section>
+    <div style="text-align:right;">
+      <a href="/logout" class="btn primary logout-button">Logout</a>
+    </div>
+  </div>
+</body>
+</html>
