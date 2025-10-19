@@ -31,7 +31,7 @@ def location_required(f):
             elif user_role == "caretaker":
                 user = db.query(Caretaker).filter_by(id=user_id).first()
             if not user or user.lat is None or user.lng is None:
-                flash("Please set your location first!")
+                flash("Please set your la first!")
                 return redirect(url_for("set_location"))
         finally:
             db.close()
@@ -170,12 +170,13 @@ def init_app(app):
     @login_required
     def dashboard():
         user_id = session.get("user_id")
+        role = session.get("user_role")
         db = SessionLocal()
         try:
-            if session.get('user_role') == 'senior':
+            if role == 'senior':
                 user = db.query(Senior).filter_by(id=user_id).first()
                 return render_template('dashboard_senior.html', user=user)
-            elif session.get('user_role') == 'caretaker':
+            elif role == 'caretaker':
                 user = db.query(Caretaker).filter_by(id=user_id).first()
                 requests = db.query(HelpRequest).options(joinedload(HelpRequest.senior)).all()
                 data = [
@@ -185,63 +186,36 @@ def init_app(app):
                         "title": r.title,
                         "description": r.description,
                         "category": r.category,
-                        "location": r.location,
+                        "lat": r.lat,
+                        "lng": r.lng,
                         "status": r.status,
                         "created_at": r.created_at,
                         "senior_name": r.senior.name
                     }
                     for r in requests
                 ]
-                return render_template('dashboard_caretaker.html', user=user, requests=data)
+                accepted = db.query(Request).options(joinedload(Request.senior)).filter_by(caretaker_id=user_id).all()
+                print("ACCEPTED:", accepted)
+                atad = [
+                    {
+                        "id": r.id,
+                        "senior_id": r.senior_id,
+                        "title": r.title,
+                        "description": r.description,
+                        "category": r.category,
+                        "lat": r.lat,
+                        "lng": r.lng,
+                        "status": r.status,
+                        "caretaker_id": r.caretaker_id,
+                        "senior_name": r.senior.name
+                    }
+                    for r in accepted
+                ]
+                return render_template('dashboard_caretaker.html', user=user, requests=data, accepted=atad)
         finally:
             db.close()
-
-            return render_template('dashboard_senior.html', user=user)
-        elif session.get('user_role') == 'caretaker':
-            user = db.query(Caretaker).filter_by(id=user_id).first()
-            db.close()
-            db = SessionLocal()
-            try:
-                requests = db.query(HelpRequest).options(joinedload(HelpRequest.senior)).all()
-            finally:
-                db.close()
-            data = [
-                {
-                    "id": r.id,
-                    "senior_id": r.senior_id,
-                    "title": r.title,
-                    "description": r.description,
-                    "category": r.category,
-                    "location": r.location,
-                    "status": r.status,
-                    "created_at": r.created_at,
-                    "senior_name": r.senior.name
-                }
-                for r in requests
-            ]
-            db = SessionLocal()
-            try:
-                accepted = db.query(Request).options(joinedload(Request.senior)).filter_by(caretaker_id=user_id).all()
-            finally:
-                db.close()
-            atad = [
-                {
-                    "id": r.id,
-                    "senior_id": r.senior_id,
-                    "title": r.title,
-                    "description": r.description,
-                    "category": r.category,
-                    "location": r.location,
-                    "status": r.status,
-                    "caretaker_id": r.caretaker_id,
-                    "senior_name": r.senior.name
-                }
-                for r in accepted
-            ]
-
-            return render_template('dashboard_caretaker.html', user=user, requests=data, accepted=atad)
-        db.close()
         return redirect('/login')
+
 
     @app.route("/<path:filename>")
     def serve_static(filename):
@@ -287,7 +261,8 @@ def init_app(app):
                     "title": r.title,
                     "description": r.description,
                     "category": r.category,
-                    "location": r.location,
+                    "lat": r.lat,
+                    "lng": r.lng,
                     "status": r.status,
                     "created_at": r.created_at,
                     "time": r.time,
@@ -301,7 +276,8 @@ def init_app(app):
                     "title": r.title,
                     "description": r.description,
                     "category": r.category,
-                    "location": r.location,
+                    "lat": r.lat,
+                    "lng": r.lng,
                     "status": r.status,
                     "caretaker_id": r.caretaker_id,
                     "time": r.time,
@@ -319,8 +295,11 @@ def init_app(app):
             title = request.form.get("title")
             description = request.form.get("description")
             category = request.form.get("category")
-            location = request.form.get("location")
-            if not title or not description or not category or not location:
+            db = SessionLocal()
+            req = db.query(Senior).filter_by(id=user_id).first()
+            lat = req.lat
+            lng = req.lng
+            if not title or not description or not category or not lat or not lng:
                 flash("All fields are required!")
                 return redirect(url_for("request_help"))
             db = SessionLocal()
@@ -330,7 +309,8 @@ def init_app(app):
                     title=title,
                     description=description,
                     category=category,
-                    location=location
+                    lat=lat,
+                    lng=lng
                 )
                 db.add(help_request)
                 db.commit()
@@ -338,7 +318,9 @@ def init_app(app):
                 db.close()
             flash("Your help request has been submitted!")
             return redirect(url_for("dashboard"))
-        return render_template("request_help.html")
+        db = SessionLocal()
+        user = db.query(Senior).filter_by(id=user_id).first()
+        return render_template("request_help.html", user=user)
 
     @app.route("/set_location", methods=["GET", "POST"])
     @login_required
@@ -358,6 +340,7 @@ def init_app(app):
                     return redirect(url_for("dashboard"))
         finally:
             db.close()
+        user = db.query(Senior).filter_by(id=user_id).first()
         return render_template("set_location.html", user=user)
 
     @app.route('/get_senior', methods=['POST'])
@@ -383,7 +366,8 @@ def init_app(app):
             title=req.title,
             description=req.description,
             category=req.category,
-            location=req.location,
+            lat=req.lat,
+            lng=req.lng,
             caretaker_id=session.get("user_id"),
             time=req.time,
         )

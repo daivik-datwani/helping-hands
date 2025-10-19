@@ -42,8 +42,8 @@
           <input id="datetime" name="datetime" type="datetime-local" required>
 
           <label for="location">Location</label>
-          <input id="location" name="location" type="text" required autocomplete="off">
-
+          Send to Lat:{{ user.lat }} Long:{{ user.lng }}
+          <button type="button" class="btn muted" onclick="window.open("set_location.html", "_self")">Change Location</button>
           <button class="btn primary" type="submit">Submit Request</button>
         </form>
 
