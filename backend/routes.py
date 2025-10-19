@@ -29,21 +29,22 @@ def init_app(app):
     def login():
         return render_template("login.html")
 
-
     @app.route("/login_senior", methods=["GET", "POST"])
     def login_senior():
         if request.method == "POST":
             contact = request.form.get("email")
             password = request.form.get("password")
-            session = SessionLocal()
+            db = SessionLocal()
             try:
                 user = None
-                if email:
-                    user = session.query(User).filter_by(email=email).first()
-                if not user and phone:
-                    user = session.query(User).filter_by(phone=phone).first()
+                if contact:
+                    # Check both email and phone
+                    user = db.query(Senior).filter(
+                        (Senior.email == contact) | (Senior.phone == contact)
+                    ).first()
             finally:
-                session.close()
+                db.close()
+
             if user and check_password_hash(user.password_hash, password):
                 session["user_id"] = user.id
                 session["user_name"] = user.name
@@ -57,19 +58,19 @@ def init_app(app):
         if request.method == "POST":
             contact = request.form.get("email")
             password = request.form.get("password")
-            session = SessionLocal()
+            db = SessionLocal()
             try:
-                cs = None
-                if email:
-                    cs = session.query(Caretaker).filter_by(email=email).first()
-                if not user and phone:
-                    cs = session.query(Caretaker).filter_by(phone=phone).first()
+                caretaker = None
+                if contact:
+                    caretaker = db.query(Caretaker).filter(
+                        (Caretaker.email == contact) | (Caretaker.phone == contact)
+                    ).first()
             finally:
-                session.close()
-            db.close()
-            if user and check_password_hash(user.password_hash, password):
-                session["user_id"] = user.id
-                session["user_name"] = user.name
+                db.close()
+
+            if caretaker and check_password_hash(caretaker.password_hash, password):
+                session["user_id"] = caretaker.id
+                session["user_name"] = caretaker.name
                 return redirect(url_for("home"))
             flash("Invalid credentials")
             return redirect(url_for("login_caretaker"))
@@ -82,12 +83,20 @@ def init_app(app):
         email = request.form.get("email")
         phone = request.form.get("phone")
         password = request.form.get("password")
+
         if not name or not password or (not email and not phone):
             flash("All fields are required.")
             return redirect(url_for("signup_senior"))
+
         hashed_password = generate_password_hash(password)
         db = SessionLocal()
-        new_user = Senior(name=name, age=age, email=email if email else None, phone=phone if phone else None, password_hash=hashed_password)
+        new_user = Senior(
+            name=name,
+            age=age,
+            email=email if email else None,
+            phone=phone if phone else None,
+            password_hash=hashed_password
+        )
         db.add(new_user)
         db.commit()
         db.close()
@@ -101,34 +110,67 @@ def init_app(app):
         email = request.form.get("email")
         phone = request.form.get("phone")
         password = request.form.get("password")
+
         if not name or not password or (not email and not phone):
             flash("All fields are required.")
             return redirect(url_for("signup_caretaker"))
+
         hashed_password = generate_password_hash(password)
         db = SessionLocal()
-        new_user = Caretaker(name=name, age=age, email=email if email else None, phone=phone if phone else None, password_hash=hashed_password)
+        new_user = Caretaker(
+            name=name,
+            age=age,
+            email=email if email else None,
+            phone=phone if phone else None,
+            password_hash=hashed_password
+        )
         db.add(new_user)
         db.commit()
         db.close()
         flash("Signup successful! Please log in.")
         return redirect(url_for("login_caretaker"))
 
-        session = SessionLocal()
-        new_c = Caretaker(name=name, age=age, email=email, phone=phone, password=password)
-        session.add(new_c)
-        session.commit()
-        session.close()
-        # after successful signup, redirect to the login page
-        return redirect(url_for('login_caretaker'))
-
     @app.route('/dashboard')
     def dashboard():
-        username = request.cookies.get('username')
+        username = session.get("user_name")
         if not username:
             return redirect('/login')
-        return render_template('dashboard.html', username=username)
+        return render_template('dashboard.html', name=username)
 
-    # this code makes url allow no file extension
     @app.route("/<path:filename>")
     def serve_static(filename):
         return send_from_directory('frontend', filename)
+    @app.route("/users", methods=["GET"])
+    def get_all_users():
+        db = SessionLocal()
+        try:
+            seniors = db.query(Senior).all()
+            caretakers = db.query(Caretaker).all()
+        finally:
+            db.close()
+
+        data = {
+            "seniors": [
+                {
+                    "id": s.id,
+                    "name": s.name,
+                    "age": s.age,
+                    "email": s.email,
+                    "phone": s.phone,
+                    "password_hash": s.password_hash
+                }
+                for s in seniors
+            ],
+            "caretakers": [
+                {
+                    "id": c.id,
+                    "name": c.name,
+                    "age": c.age,
+                    "email": c.email,
+                    "phone": c.phone,
+                    "password_hash": c.password_hash
+                }
+                for c in caretakers
+            ]
+        }
+        return jsonify(data)
