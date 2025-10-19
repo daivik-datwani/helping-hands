@@ -1,6 +1,6 @@
 from flask import *
 from backend.db import SessionLocal
-from backend.models.helpinghandsdatabase import Senior, Caretaker, HelpRequest
+from backend.models.helpinghandsdatabase import Senior, Caretaker, HelpRequest, Request
 from werkzeug.security import generate_password_hash, check_password_hash
 from backend.helpers import *
 from sqlalchemy.orm import joinedload
@@ -161,7 +161,7 @@ def init_app(app):
             db.close()
             db = SessionLocal()
             try:
-                	requests = db.query(HelpRequest).options(joinedload(HelpRequest.senior)).all()
+                requests = db.query(HelpRequest).options(joinedload(HelpRequest.senior)).all()
             finally:
                 db.close()
             data = [
@@ -178,8 +178,27 @@ def init_app(app):
                 }
                 for r in requests
             ]
-           
-            return render_template('dashboard_caretaker.html', user=user, requests=data)
+            db = SessionLocal()
+            try:
+                accepted = db.query(Request).options(joinedload(Request.senior)).filter_by(caretaker_id=user_id).all()
+            finally:
+                db.close()
+            atad = [
+                {
+                    "id": r.id,
+                    "senior_id": r.senior_id,
+                    "title": r.title,
+                    "description": r.description,
+                    "category": r.category,
+                    "location": r.location,
+                    "status": r.status,
+                    "caretaker_id": r.caretaker_id,
+                    "senior_name": r.senior.name
+                }
+                for r in accepted
+            ]
+
+            return render_template('dashboard_caretaker.html', user=user, requests=data, accepted=atad)
         db.close()
         return redirect('/login')
 
@@ -193,6 +212,7 @@ def init_app(app):
             seniors = db.query(Senior).all()
             caretakers = db.query(Caretaker).all()
             hr = db.query(HelpRequest).all()
+            re = db.query(Request).all()
         finally:
             db.close()
 
@@ -229,10 +249,24 @@ def init_app(app):
                     "location": r.location,
                     "status": r.status,
                     "created_at": r.created_at,
+                    "time": r.time,
                 }
                 for r in hr
-            ]
-        }
+            ],
+            "requests": [
+                {
+                    "id": r.id,
+                    "senior_id": r.senior_id,
+                    "title": r.title,
+                    "description": r.description,
+                    "category": r.category,
+                    "location": r.location,
+                    "status": r.status,
+                    "caretaker_id": r.caretaker_id,
+                    "time": r.time,
+                }
+                for r in re
+            ]        }
         return jsonify(data)
 
     @app.route("/request_help", methods=["GET", "POST"])
@@ -279,3 +313,24 @@ def init_app(app):
             })
         finally:
             db.close()
+
+    @app.route('/accept_request', methods=['POST'])
+    def accept_request():
+        id = request.form.get("id")
+        db = SessionLocal()
+        req = db.query(HelpRequest).filter_by(id=id).first()
+        #First we need to create a item in the database Request with the information from the item in HelpRequest
+        new_user = Request(
+            senior_id=req.senior_id,
+            title=req.title,
+            description=req.description,
+            category=req.category,
+            location=req.location,
+            caretaker_id=session.get("user_id"),
+            time=req.time,
+        )
+        db.add(new_user)
+        db.delete(req)
+        db.commit()
+        db.close()
+        return redirect(url_for('dashboard'))

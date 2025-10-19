@@ -25,13 +25,14 @@
     </section>
     <br>
     <section class="stripe">
-      <h2 class="hero-title" style="font-size:2em;">📋 Your Accepted Requests</h2>
+      <h2 class="hero-title" style="font-size:2em;">🆘 Requests</h2>
       {% if requests and requests|length > 0 %}
         <div class="stripe-grid">
         {% for request in requests %}
           <div class="stripe-card">
-            <strong>{{ request.category }}</strong><br>
-            <strong>Time:</strong> {{ request.created_at }}<br>
+            <strong>{{ request.title }}</strong><br>
+            {{ request.category }}<br>
+            <strong>Time:</strong> {{ request.time }}<br>
             <strong>Description:</strong> {{ request.description }}<br>
             {% if request.senior_name %}
               <strong>Senior:</strong>
@@ -42,6 +43,32 @@
               <br>
             {% endif %}
             <strong>Status:</strong> {{ request.status|title }}
+            <form action="/accept_request" method="post"><button type="submit" class="btn primary" name="id" value="{{ request.id }}">Accept</button></form>
+          </div>
+        {% endfor %}
+        </div>
+      {% else %}
+        <p>No requests. Come back later!</p>
+      {% endif %}
+      <h2 class="hero-title" style="font-size:2em;">📋 Your Accepted Requests</h2>
+      {% if accepted and accepted|length > 0 %}
+        <div class="stripe-grid">
+        {% for accept in accepted %}
+          <div class="stripe-card">
+            <strong>{{ accept.title }}</strong><br>
+            {{ accept.category }}<br>
+            <strong>Time:</strong> {{ accept.time }}<br>
+            <strong>Description:</strong> {{ accept.description }}<br>
+            {% if accept.senior_name %}
+              <strong>Senior:</strong>
+              <button onclick="loadSeniorDetails({{ accept.senior_id }}, this)">
+                {{ accept.senior_name }}
+              </button>
+              <div class="senior-details"></div>
+              <br>
+            {% endif %}
+            <strong>Status:</strong> {{ accept.status|title }}
+            <form action="" method="post"><button type="button" class="btn primary" name="" value="">Done</button></form>
           </div>
         {% endfor %}
         </div>

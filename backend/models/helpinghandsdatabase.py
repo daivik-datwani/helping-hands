@@ -40,18 +40,23 @@ class HelpRequest(Base):
     location = Column(String, nullable=False)
     status = Column(String, default="Pending")
     created_at = Column(DateTime, default=datetime.utcnow)
+    time = Column(DateTime)
+    
 
     senior = relationship("Senior")
 
 class Request(Base):
     __tablename__ = "requests"
 
-    id = Column(Integer, primary_key=True)
-    time = Column(String)
+    id = Column(Integer, primary_key=True, index=True)
     senior_id = Column(Integer, ForeignKey("seniors.id"))
+    title = Column(String, nullable=False)
+    description = Column(String, nullable=False)
+    category = Column(String, nullable=False)
+    location = Column(String, nullable=False)
+    status = Column(String, default="Pending")
     caretaker_id = Column(Integer, ForeignKey("caretakers.id"))
-    location = Column(String)
-    amount_paid = Column(Integer)
+    time = Column(DateTime)
 
     senior = relationship("Senior", back_populates="requests")
     caretaker = relationship("Caretaker", back_populates="requests")
