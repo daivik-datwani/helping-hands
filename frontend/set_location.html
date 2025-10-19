@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Set Location</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    #map { height: 500px; width: 100%; margin-bottom: 10px; }
+    label { display: block; margin-top: 5px; }
+    input[readonly] { background: #f0f0f0; border: 1px solid #ccc; padding: 5px; width: 200px; }
+    button { margin-top: 10px; padding: 8px 12px; }
+  </style>
+</head>
+<body>
+  <h2>Set Your Location</h2>
+  <div id="map"></div>
+
+  <form id="locationForm" method="POST" action="/set_location">
+    <label>Latitude: <input type="text" id="lat" name="lat" readonly></label>
+    <label>Longitude: <input type="text" id="lng" name="lng" readonly></label>
+    <button type="submit">Save Location</button>
+  </form>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+  (function() {
+    let initialLat = {{ user.lat or 25.276987 }};
+    let initialLng = {{ user.lng or 55.296249 }};
+    let marker;
+
+    const map = L.map('map').setView([initialLat, initialLng], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    function updateCoords(latlng) {
+      document.getElementById('lat').value = latlng.lat.toFixed(6);
+      document.getElementById('lng').value = latlng.lng.toFixed(6);
+    }
+
+    if ({{ "true" if user.lat and user.lng else "false" }}) {
+      marker = L.marker([initialLat, initialLng], { draggable: true }).addTo(map);
+      marker.on('dragend', function(event) {
+        updateCoords(event.target.getLatLng());
+      });
+      updateCoords({ lat: initialLat, lng: initialLng });
+    }
+
+    map.on('click', function(e) {
+      if (marker) {
+        marker.setLatLng(e.latlng);
+      } else {
+        marker = L.marker(e.latlng, { draggable: true }).addTo(map);
+        marker.on('dragend', function(event) {
+          updateCoords(event.target.getLatLng());
+        });
+      }
+      updateCoords(e.latlng);
+    });
+  })();
+  </script>
+</body>
+</html>
