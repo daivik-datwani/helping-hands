@@ -36,15 +36,19 @@ def init_app(app):
     @app.route("/login_senior", methods=["GET", "POST"])
     def login_senior():
         if request.method == "POST":
-            contact = request.form.get("email")
+            email = request.form.get("email")
+            phone = request.form.get("phone")
             password = request.form.get("password")
             db = SessionLocal()
             try:
                 user = None
-                if contact:
-                    # Check both email and phone
+                if email:
                     user = db.query(Senior).filter(
-                        (Senior.email == contact) | (Senior.phone == contact)
+                        (Senior.email == email)
+                    ).first()
+                if phone and not user:
+                    user = db.query(Senior).filter(
+                        (Senior.phone == phone)
                     ).first()
             finally:
                 db.close()
@@ -52,6 +56,7 @@ def init_app(app):
             if user and check_password_hash(user.password_hash, password):
                 session["user_id"] = user.id
                 session["user_name"] = user.name
+                session["user_role"] = "senior"
                 return redirect(url_for("dashboard"))
             flash("Invalid credentials")
             return redirect(url_for("login_senior"))
@@ -60,14 +65,19 @@ def init_app(app):
     @app.route("/login_caretaker", methods=["GET", "POST"])
     def login_caretaker():
         if request.method == "POST":
-            contact = request.form.get("email")
+            email = request.form.get("email")
+            phone = request.form.get("phone")
             password = request.form.get("password")
             db = SessionLocal()
             try:
                 caretaker = None
-                if contact:
+                if email:
                     caretaker = db.query(Caretaker).filter(
-                        (Caretaker.email == contact) | (Caretaker.phone == contact)
+                        (Caretaker.email == email)
+                    ).first()
+                if phone and not caretaker:
+                    caretaker = db.query(Caretaker).filter(
+                        (Caretaker.phone == phone)
                     ).first()
             finally:
                 db.close()
@@ -75,7 +85,8 @@ def init_app(app):
             if caretaker and check_password_hash(caretaker.password_hash, password):
                 session["user_id"] = caretaker.id
                 session["user_name"] = caretaker.name
-                return redirect(url_for("home"))
+                session["user_role"] = "caretaker"
+                return redirect(url_for("dashboard"))
             flash("Invalid credentials")
             return redirect(url_for("login_caretaker"))
         return render_template("login_caretaker.html")
@@ -139,15 +150,16 @@ def init_app(app):
         user_id = session.get("user_id")
         if not user_id:
             return redirect('/login')
-
         db = SessionLocal()
-        user = db.query(Senior).filter_by(id=user_id).first() or db.query(Caretaker).filter_by(id=user_id).first()
+        user = db.query(Senior).filter_by(id=user_id).first()
+        if session.get('user_role') == 'senior':
+            db.close()
+            return render_template('dashboard_senior.html', user=user)
+        elif session.get('user_role') == 'caretaker':
+            db.close()
+            return render_template('dashboard_caretaker.html', user=user)
         db.close()
-
-        if not user:
-            return redirect('/login')
-
-        return render_template('dashboard.html', user=user)
+        return redirect('/login')
 
     @app.route("/<path:filename>")
     def serve_static(filename):
@@ -215,6 +227,6 @@ def init_app(app):
             db.close()
 
             flash("Your help request has been submitted!")
-            return redirect(url_for("dashboard"))
+            return redirect(url_for("dashboard_senior"))
 
         return render_template("request_help.html")
