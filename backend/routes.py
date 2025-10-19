@@ -3,6 +3,7 @@ from backend.db import SessionLocal
 from backend.models.helpinghandsdatabase import Senior, Caretaker, HelpRequest
 from werkzeug.security import generate_password_hash, check_password_hash
 from backend.helpers import *
+from sqlalchemy.orm import joinedload
 
 def init_app(app):
     @app.route("/")
@@ -158,7 +159,27 @@ def init_app(app):
         elif session.get('user_role') == 'caretaker':
             user = db.query(Caretaker).filter_by(id=user_id).first()
             db.close()
-            return render_template('dashboard_caretaker.html', user=user)
+            db = SessionLocal()
+            try:
+                	requests = db.query(HelpRequest).options(joinedload(HelpRequest.senior)).all()
+            finally:
+                db.close()
+            data = [
+                {
+                    "id": r.id,
+                    "senior_id": r.senior_id,
+                    "title": r.title,
+                    "description": r.description,
+                    "category": r.category,
+                    "location": r.location,
+                    "status": r.status,
+                    "created_at": r.created_at,
+                    "senior_name": r.senior.name
+                }
+                for r in requests
+            ]
+           
+            return render_template('dashboard_caretaker.html', user=user, requests=data)
         db.close()
         return redirect('/login')
 
@@ -171,6 +192,7 @@ def init_app(app):
         try:
             seniors = db.query(Senior).all()
             caretakers = db.query(Caretaker).all()
+            hr = db.query(HelpRequest).all()
         finally:
             db.close()
 
@@ -196,6 +218,19 @@ def init_app(app):
                     "password_hash": c.password_hash
                 }
                 for c in caretakers
+            ],
+            "help_requests": [
+                {
+                    "id": r.id,
+                    "senior_id": r.senior_id,
+                    "title": r.title,
+                    "description": r.description,
+                    "category": r.category,
+                    "location": r.location,
+                    "status": r.status,
+                    "created_at": r.created_at,
+                }
+                for r in hr
             ]
         }
         return jsonify(data)
@@ -204,17 +239,14 @@ def init_app(app):
         user_id = session.get("user_id")
         if not user_id:
             return redirect("/login_senior")
-
         if request.method == "POST":
             title = request.form.get("title")
             description = request.form.get("description")
             category = request.form.get("category")
             location = request.form.get("location")
-
             if not title or not description or not category or not location:
                 flash("All fields are required!")
                 return redirect(url_for("request_help"))
-
             db = SessionLocal()
             help_request = HelpRequest(
                 senior_id=user_id,
@@ -226,8 +258,23 @@ def init_app(app):
             db.add(help_request)
             db.commit()
             db.close()
-
             flash("Your help request has been submitted!")
             return redirect(url_for("dashboard_senior"))
-
         return render_template("request_help.html")
+
+    @app.route('/get_senior', methods=['POST'])
+    def get_senior():
+        senior_id = request.json.get('id')
+        db = SessionLocal()
+        try:
+            senior = db.query(Senior).filter_by(id=senior_id).first()
+            if not senior:
+                return jsonify({"error": "Senior not found"}), 404
+            return jsonify({
+                "name": senior.name,
+                "age": senior.age,
+                "email": senior.email,
+                "phone": senior.phone
+            })
+        finally:
+            db.close()

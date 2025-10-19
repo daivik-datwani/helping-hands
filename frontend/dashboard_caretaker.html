@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Senior Dashboard | Helping Hands</title>
+  <title>Caretaker Dashboard | Helping Hands</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -29,29 +29,57 @@
     <br>
     <section class="stripe">
       <h2 class="hero-title" style="font-size:2em;">📋 Your Accepted Requests</h2>
-      <button type="button" class="btn primary" onclick="window.open('/request_help','_self')">Help people idk</button>
       {% if requests and requests|length > 0 %}
         <div class="stripe-grid">
         {% for request in requests %}
           <div class="stripe-card">
-            <strong>{{ request.service_type }}</strong><br>
-            <strong>Date:</strong> {{ request.date }}<br>
-            <strong>Time:</strong> {{ request.time }}<br>
+            <strong>{{ request.category }}</strong><br>
+            <strong>Time:</strong> {{ request.created_at }}<br>
             <strong>Description:</strong> {{ request.description }}<br>
-            {% if request.caregiver_name %}
-            <strong>Senior:</strong> {{ request.senior_id }}<br>
+            {% if request.senior_name %}
+              <strong>Senior:</strong>
+              <button onclick="loadSeniorDetails({{ request.senior_id }})">
+              {{ request.senior_name }}
+                <div id="senior-details"></div>
+
+              </button>
+
+              <br>
             {% endif %}
             <strong>Status:</strong> {{ request.status|title }}
           </div>
         {% endfor %}
         </div>
       {% else %}
-        <p>Accept one please</p>
+        <p>Accept one please {{ requests.first() }}</p>
       {% endif %}
     </section>
     <div style="text-align:right;">
       <a href="/logout" class="btn primary logout-button">Logout</a>
     </div>
+    <script>
+    async function loadSeniorDetails(seniorId) {
+      const response = await fetch('/get_senior', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: seniorId })
+      });
+      const data = await response.json();
+      if (data.error) {
+        alert(data.error);
+        return;
+      }
+      const details = document.getElementById('senior-details');
+      details.innerHTML = `
+        <div class="stripe-card">
+          <h3>${data.name}</h3>
+          <p><strong>Age:</strong> ${data.age}</p>
+          <p><strong>Email:</strong> ${data.email}</p>
+          <p><strong>Phone:</strong> ${data.phone}</p>
+        </div>
+      `;
+    }
+    </script>
   </div>
 </body>
 </html>
