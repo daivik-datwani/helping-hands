@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Set Location | Helping Hands</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+    :root{
+      --warm-orange: #FF8A37;
+      --deep-red: #D64545;
+      --sun-yellow: #FFD166;
+      --muted: #1d1a18;
+      --bg: #fff6f0;
+      --white: #ffffff;
+      --shadow-1: 0 6px 20px rgba(214,69,69,0.08);
+      --shadow-2: 0 10px 40px rgba(214,69,69,0.06);
+      --radius-lg: 18px;
+      --radius-sm: 10px;
+      --max-width: 1100px;
+    }
+    body {
+      background: var(--bg);
+      font-family: Inter, 'Segoe UI', Arial, sans-serif;
+      color: var(--muted);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    h2 {
+      margin: 38px 0 18px 0;
+      text-align: center;
+      color: var(--deep-red);
+      font-size: 2em;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+    .location-card {
+      background: var(--white);
+      max-width: 420px;
+      margin: 0 auto 36px auto;
+      padding: 36px 30px 30px 30px;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-1);
+      border: 1.5px solid #fee3c7;
+      text-align: center;
+    }
+    #map {
+      height: 420px;
+      width: 92%;
+      border-radius: var(--radius-lg);
+      margin: 0 auto 24px auto;
+      box-shadow: var(--shadow-2);
+      border: 2px solid #ffe5d0;
+      display: block;
+    }
+    .location-card label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-weight: 600;
+      font-size: 1.08em;
+      margin: 22px 0 0 0;
+      color: var(--deep-red);
+    }
+    input[readonly] {
+      background: #fff6f0;
+      border: 1.5px solid #eac2b6;
+      padding: 10px 16px;
+      width: 150px;
+      border-radius: var(--radius-sm);
+      font-size: 1em;
+      color: var(--muted);
+      font-family: inherit;
+    }
+    button {
+      margin-top: 30px;
+      padding: 14px 38px;
+      background: linear-gradient(90deg, var(--warm-orange), var(--deep-red) 68%);
+      color: var(--white);
+      border: none;
+      border-radius: 999px;
+      font-size: 1.18em;
+      font-weight: 700;
+      letter-spacing: .5px;
+      box-shadow: var(--shadow-1);
+      cursor: pointer;
+      transition: background 0.16s, box-shadow 0.13s;
+    }
+    button:hover {
+      background: linear-gradient(90deg,var(--deep-red) 68%, var(--warm-orange) );
+      box-shadow: 0 6px 20px rgba(214,69,69,0.18);
+    }
+    @media (max-width: 660px) {
+      #map { width: 99vw; height: 250px; }
+      .location-card { max-width: 99vw; padding: 16px 5vw; }
+      h2 { font-size: 1.12em; margin-top: 18px;}
+    }
+  </style>
+</head>
+<body>
+  <h2>Set Your Location</h2>
+  <div id="map"></div>
+  <form id="locationForm" method="POST" action="/set_location" class="location-card">
+    <label>Latitude:
+      <input type="text" id="lat" name="lat" readonly>
+    </label>
+    <label>Longitude:
+      <input type="text" id="lng" name="lng" readonly>
+    </label>
+    <button type="submit">Save Location</button>
+  </form>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+  (function() {
+    let initialLat = {{ user.lat or 25.276987 }};
+    let initialLng = {{ user.lng or 55.296249 }};
+    let marker;
+
+    const map = L.map('map').setView([initialLat, initialLng], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    function updateCoords(latlng) {
+      document.getElementById('lat').value = latlng.lat.toFixed(6);
+      document.getElementById('lng').value = latlng.lng.toFixed(6);
+    }
+
+    if ({{ "true" if user.lat and user.lng else "false" }}) {
+      marker = L.marker([initialLat, initialLng], { draggable: true }).addTo(map);
+      marker.on('dragend', function(event) {
+        updateCoords(event.target.getLatLng());
+      });
+      updateCoords({ lat: initialLat, lng: initialLng });
+    }
+
+    map.on('click', function(e) {
+      if (marker) {
+        marker.setLatLng(e.latlng);
+      } else {
+        marker = L.marker(e.latlng, { draggable: true }).addTo(map);
+        marker.on('dragend', function(event) {
+          updateCoords(event.target.getLatLng());
+        });
+      }
+      updateCoords(e.latlng);
+    });
+  })();
+  </script>
+</body>
+</html>

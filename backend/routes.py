@@ -4,6 +4,39 @@ from backend.models.helpinghandsdatabase import Senior, Caretaker, HelpRequest, 
 from werkzeug.security import generate_password_hash, check_password_hash
 from backend.helpers import *
 from sqlalchemy.orm import joinedload
+from functools import wraps
+
+def login_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not session.get("user_id"):
+            flash("You need to log in first!")
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+    return decorated
+
+def location_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        user_id = session.get("user_id")
+        user_role = session.get("user_role")
+        if not user_id or not user_role:
+            flash("You need to log in first!")
+            return redirect(url_for("login"))
+        db = SessionLocal()
+        try:
+            user = None
+            if user_role == "senior":
+                user = db.query(Senior).filter_by(id=user_id).first()
+            elif user_role == "caretaker":
+                user = db.query(Caretaker).filter_by(id=user_id).first()
+            if not user or user.lat is None or user.lng is None:
+                flash("Please set your location first!")
+                return redirect(url_for("set_location"))
+        finally:
+            db.close()
+        return f(*args, **kwargs)
+    return decorated
 
 def init_app(app):
     @app.route("/")
@@ -24,11 +57,12 @@ def init_app(app):
     @app.route("/signup_caretaker.html")
     def signup_caretaker():
         return render_template("signup_caretaker.html")
+
     @app.route("/logout")
     def logout():
         session.clear()
         return redirect(url_for("login"))
-        
+
     @app.route("/login")
     @app.route("/login.html")
     def login():
@@ -44,16 +78,11 @@ def init_app(app):
             try:
                 user = None
                 if email:
-                    user = db.query(Senior).filter(
-                        (Senior.email == email)
-                    ).first()
+                    user = db.query(Senior).filter(Senior.email == email).first()
                 if phone and not user:
-                    user = db.query(Senior).filter(
-                        (Senior.phone == phone)
-                    ).first()
+                    user = db.query(Senior).filter(Senior.phone == phone).first()
             finally:
                 db.close()
-
             if user and check_password_hash(user.password_hash, password):
                 session["user_id"] = user.id
                 session["user_name"] = user.name
@@ -73,16 +102,11 @@ def init_app(app):
             try:
                 caretaker = None
                 if email:
-                    caretaker = db.query(Caretaker).filter(
-                        (Caretaker.email == email)
-                    ).first()
+                    caretaker = db.query(Caretaker).filter(Caretaker.email == email).first()
                 if phone and not caretaker:
-                    caretaker = db.query(Caretaker).filter(
-                        (Caretaker.phone == phone)
-                    ).first()
+                    caretaker = db.query(Caretaker).filter(Caretaker.phone == phone).first()
             finally:
                 db.close()
-
             if caretaker and check_password_hash(caretaker.password_hash, password):
                 session["user_id"] = caretaker.id
                 session["user_name"] = caretaker.name
@@ -99,11 +123,9 @@ def init_app(app):
         email = request.form.get("email")
         phone = request.form.get("phone")
         password = request.form.get("password")
-
         if not name or not password or (not email and not phone):
             flash("All fields are required.")
             return redirect(url_for("signup_senior"))
-
         hashed_password = generate_password_hash(password)
         db = SessionLocal()
         new_user = Senior(
@@ -126,11 +148,9 @@ def init_app(app):
         email = request.form.get("email")
         phone = request.form.get("phone")
         password = request.form.get("password")
-
         if not name or not password or (not email and not phone):
             flash("All fields are required.")
             return redirect(url_for("signup_caretaker"))
-
         hashed_password = generate_password_hash(password)
         db = SessionLocal()
         new_user = Caretaker(
@@ -147,14 +167,35 @@ def init_app(app):
         return redirect(url_for("login_caretaker"))
 
     @app.route('/dashboard')
+    @login_required
     def dashboard():
         user_id = session.get("user_id")
-        if not user_id:
-            return redirect('/login')
         db = SessionLocal()
-        if session.get('user_role') == 'senior':
-            user = db.query(Senior).filter_by(id=user_id).first()
+        try:
+            if session.get('user_role') == 'senior':
+                user = db.query(Senior).filter_by(id=user_id).first()
+                return render_template('dashboard_senior.html', user=user)
+            elif session.get('user_role') == 'caretaker':
+                user = db.query(Caretaker).filter_by(id=user_id).first()
+                requests = db.query(HelpRequest).options(joinedload(HelpRequest.senior)).all()
+                data = [
+                    {
+                        "id": r.id,
+                        "senior_id": r.senior_id,
+                        "title": r.title,
+                        "description": r.description,
+                        "category": r.category,
+                        "location": r.location,
+                        "status": r.status,
+                        "created_at": r.created_at,
+                        "senior_name": r.senior.name
+                    }
+                    for r in requests
+                ]
+                return render_template('dashboard_caretaker.html', user=user, requests=data)
+        finally:
             db.close()
+
             return render_template('dashboard_senior.html', user=user)
         elif session.get('user_role') == 'caretaker':
             user = db.query(Caretaker).filter_by(id=user_id).first()
@@ -205,6 +246,7 @@ def init_app(app):
     @app.route("/<path:filename>")
     def serve_static(filename):
         return send_from_directory('frontend', filename)
+
     @app.route("/users", methods=["GET"])
     def get_all_users():
         db = SessionLocal()
@@ -215,7 +257,6 @@ def init_app(app):
             re = db.query(Request).all()
         finally:
             db.close()
-
         data = {
             "seniors": [
                 {
@@ -270,10 +311,10 @@ def init_app(app):
         return jsonify(data)
 
     @app.route("/request_help", methods=["GET", "POST"])
+    @login_required
+    @location_required
     def request_help():
         user_id = session.get("user_id")
-        if not user_id:
-            return redirect("/login_senior")
         if request.method == "POST":
             title = request.form.get("title")
             description = request.form.get("description")
@@ -283,19 +324,41 @@ def init_app(app):
                 flash("All fields are required!")
                 return redirect(url_for("request_help"))
             db = SessionLocal()
-            help_request = HelpRequest(
-                senior_id=user_id,
-                title=title,
-                description=description,
-                category=category,
-                location=location
-            )
-            db.add(help_request)
-            db.commit()
-            db.close()
+            try:
+                help_request = HelpRequest(
+                    senior_id=user_id,
+                    title=title,
+                    description=description,
+                    category=category,
+                    location=location
+                )
+                db.add(help_request)
+                db.commit()
+            finally:
+                db.close()
             flash("Your help request has been submitted!")
             return redirect(url_for("dashboard"))
         return render_template("request_help.html")
+
+    @app.route("/set_location", methods=["GET", "POST"])
+    @login_required
+    def set_location():
+        user_id = session.get("user_id")
+        db = SessionLocal()
+        try:
+            user = db.query(Senior).filter_by(id=user_id).first()
+            if request.method == "POST":
+                lat = request.form.get("lat")
+                lng = request.form.get("lng")
+                if lat and lng:
+                    user.lat = float(lat)
+                    user.lng = float(lng)
+                    db.commit()
+                    flash("Location saved!")
+                    return redirect(url_for("dashboard"))
+        finally:
+            db.close()
+        return render_template("set_location.html", user=user)
 
     @app.route('/get_senior', methods=['POST'])
     def get_senior():
@@ -305,12 +368,7 @@ def init_app(app):
             senior = db.query(Senior).filter_by(id=senior_id).first()
             if not senior:
                 return jsonify({"error": "Senior not found"}), 404
-            return jsonify({
-                "name": senior.name,
-                "age": senior.age,
-                "email": senior.email,
-                "phone": senior.phone
-            })
+            return jsonify({"name": senior.name, "age": senior.age, "email": senior.email, "phone": senior.phone})
         finally:
             db.close()
 
@@ -334,3 +392,4 @@ def init_app(app):
         db.commit()
         db.close()
         return redirect(url_for('dashboard'))
+
