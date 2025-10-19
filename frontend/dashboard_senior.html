@@ -35,7 +35,7 @@
 
     <section class="stripe">
       <h2 class="hero-title" style="font-size:2em;">📋 Your Upcoming Requests</h2>
-      <button type="button" class="btn primary" onclick="window.open("/request_help","_self")">Request Help</button>
+      <button type="button" class="btn primary" onclick="window.open('/request_help','_self')">Request Help</button>
       {% if requests and requests|length > 0 %}
         <div class="stripe-grid">
         {% for request in requests %}
