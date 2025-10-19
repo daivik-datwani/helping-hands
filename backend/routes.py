@@ -23,7 +23,11 @@ def init_app(app):
     @app.route("/signup_caretaker.html")
     def signup_caretaker():
         return render_template("signup_caretaker.html")
-
+    @app.route("/logout")
+    def logout():
+        session.clear()
+        return redirect(url_for("login_senior"))
+        
     @app.route("/login")
     @app.route("/login.html")
     def login():
