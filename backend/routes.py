@@ -1,6 +1,6 @@
 from flask import *
 from backend.db import SessionLocal
-from backend.models.helpinghandsdatabase import Senior, Caretaker
+from backend.models.helpinghandsdatabase import Senior, Caretaker, HelpRequest
 from werkzeug.security import generate_password_hash, check_password_hash
 from backend.helpers import *
 
@@ -132,10 +132,18 @@ def init_app(app):
 
     @app.route('/dashboard')
     def dashboard():
-        username = session.get("user_name")
-        if not username:
+        user_id = session.get("user_id")
+        if not user_id:
             return redirect('/login')
-        return render_template('dashboard.html', name=username)
+
+        db = SessionLocal()
+        user = db.query(Senior).filter_by(id=user_id).first() or db.query(Caretaker).filter_by(id=user_id).first()
+        db.close()
+
+        if not user:
+            return redirect('/login')
+
+        return render_template('dashboard.html', user=user)
 
     @app.route("/<path:filename>")
     def serve_static(filename):
@@ -174,3 +182,35 @@ def init_app(app):
             ]
         }
         return jsonify(data)
+    @app.route("/request_help", methods=["GET", "POST"])
+    def request_help():
+        user_id = session.get("user_id")
+        if not user_id:
+            return redirect("/login_senior")
+
+        if request.method == "POST":
+            title = request.form.get("title")
+            description = request.form.get("description")
+            category = request.form.get("category")
+            location = request.form.get("location")
+
+            if not title or not description or not category or not location:
+                flash("All fields are required!")
+                return redirect(url_for("request_help"))
+
+            db = SessionLocal()
+            help_request = HelpRequest(
+                senior_id=user_id,
+                title=title,
+                description=description,
+                category=category,
+                location=location
+            )
+            db.add(help_request)
+            db.commit()
+            db.close()
+
+            flash("Your help request has been submitted!")
+            return redirect(url_for("dashboard"))
+
+        return render_template("request_help.html")
