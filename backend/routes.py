@@ -174,7 +174,7 @@ def init_app(app):
         db = SessionLocal()
         try:
             if role == 'senior':
-                requests = db.query(HelpRequest).all()
+                requests = db.query(HelpRequest).filter_by(senior_id=user_id).all()
                 data = [
                     {
                         "id": r.id,
@@ -410,7 +410,6 @@ def init_app(app):
         id = request.form.get("id")
         db = SessionLocal()
         req = db.query(HelpRequest).filter_by(id=id).first()
-        #First we need to create a item in the database Request with the information from the item in HelpRequest
         new_user = Request(
             senior_id=req.senior_id,
             title=req.title,
@@ -435,5 +434,31 @@ def init_app(app):
         req.status = "Completed"
         db.commit()
         db.close()
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('feedback'))
 
+    @app.route('/feedback', methods=['GET', 'POST'])
+    def feedback():
+        if request.method == "POST":
+            request_id = request.form.get("request_id")
+            db = SessionLocal()
+            req = db.query(Request).filter_by(id=request_id).first()
+            senior_id = req.senior_id
+            caretaker_id = req.caretaker_id
+            comment = request.form.get("comment")
+            rating = request.form.get("rating")
+            time = request.form.get("time")
+            db.close()
+            db = SessionLocal()
+            try:
+                feedback = Feedback(
+                    senior_id=senior_id,
+                    caretaker_id=caretaker_id,
+                    comment=comment,
+                    rating=rating,
+                    request_id=request_id,
+                    time=time
+                )
+                db.add(feedback)
+                db.commit()
+            finally:
+                db.close()

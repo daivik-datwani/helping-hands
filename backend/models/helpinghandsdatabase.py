@@ -16,6 +16,7 @@ class Senior(Base):
     lng = Column(Float, nullable=True)
 
     help_requests = relationship("HelpRequest", back_populates="senior")
+    feedback = relationship("Feedback", back_populates="senior")
     requests = relationship("Request", back_populates="senior")
 
 
@@ -32,6 +33,7 @@ class Caretaker(Base):
     lng = Column(Float, nullable=True)
 
     requests = relationship("Request", back_populates="caretaker")
+    feedback = relationship("Feedback", back_populates="caretaker")
 
 
 class HelpRequest(Base):
@@ -56,7 +58,6 @@ class Request(Base):
     __tablename__ = "requests"
 
     id = Column(Integer, primary_key=True, index=True)
-    time = Column(DateTime, default=datetime.utcnow)
     senior_id = Column(Integer, ForeignKey("seniors.id"))
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
@@ -69,3 +70,19 @@ class Request(Base):
 
     senior = relationship("Senior", back_populates="requests")
     caretaker = relationship("Caretaker", back_populates="requests")
+    feedback = relationship("Feedback", back_populates="requests")
+
+class Feedback(Base):
+    __tablename__ = "feedback"
+
+    id = Column(Integer, primary_key=True, index=True)
+    time = Column(DateTime, default=datetime.utcnow)
+    senior_id = Column(Integer, ForeignKey("seniors.id"))
+    request_id = Column(Integer, ForeignKey("requests.id"))
+    comment = Column(String, nullable=False)
+    rating = Column(Integer)
+    caretaker_id = Column(Integer, ForeignKey("caretakers.id"))
+
+    senior = relationship("Senior", back_populates="feedback")
+    caretaker = relationship("Caretaker", back_populates="feedback")
+    requests = relationship("Request", back_populates="feedback")
