@@ -462,3 +462,7 @@ def init_app(app):
                 db.commit()
             finally:
                 db.close()
+        db = SessionLocal()
+        user_id = session.get("user_id")
+        user = db.query(Senior).filter_by(id=user_id).first()
+        return render_template("feedback.html", user=user)
