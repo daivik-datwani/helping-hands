@@ -68,7 +68,7 @@
               <br>
             {% endif %}
             <strong>Status:</strong> {{ accept.status|title }}
-            <form action="" method="post"><button type="button" class="btn primary" name="" value="">Done</button></form>
+            <form action="/done" method="post"><button type="submit" class="btn primary" name="id" value="{{ accept.id }}">Done</button></form>
           </div>
         {% endfor %}
         </div>

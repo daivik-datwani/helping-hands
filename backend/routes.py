@@ -377,3 +377,13 @@ def init_app(app):
         db.close()
         return redirect(url_for('dashboard'))
 
+    @app.route('/done', methods=['POST'])
+    def done():
+        id = request.form.get("id")
+        db = SessionLocal()
+        req = db.query(Request).filter_by(id=id).first()
+        req.status = "Completed"
+        db.commit()
+        db.close()
+        return redirect(url_for('dashboard'))
+
