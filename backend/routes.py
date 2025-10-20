@@ -31,7 +31,7 @@ def location_required(f):
             elif user_role == "caretaker":
                 user = db.query(Caretaker).filter_by(id=user_id).first()
             if not user or user.lat is None or user.lng is None:
-                flash("Please set your la first!")
+                flash("Please set your location first!")
                 return redirect(url_for("set_location"))
         finally:
             db.close()
@@ -39,6 +39,7 @@ def location_required(f):
     return decorated
 
 def init_app(app):
+
     @app.route("/")
     def home():
         return render_template("index.html")
@@ -68,7 +69,6 @@ def init_app(app):
     def login():
         return render_template("login.html")
 
-    @app.route("/login_senior", methods=["GET", "POST"])
     @app.route("/login_senior", methods=["GET", "POST"])
     def login_senior():
         if request.method == "POST":
@@ -101,8 +101,6 @@ def init_app(app):
 
         return render_template("login_senior.html")
 
-
-    @app.route("/login_caretaker", methods=["GET", "POST"])
     @app.route("/login_caretaker", methods=["GET", "POST"])
     def login_caretaker():
         if request.method == "POST":
@@ -134,7 +132,6 @@ def init_app(app):
                 db.close()
 
         return render_template("login_caretaker.html")
-
 
     @app.route("/users", methods=["POST"])
     def signup_senior_post():
@@ -173,7 +170,6 @@ def init_app(app):
         flash("Signup successful! Please log in.")
         return redirect(url_for("login_senior"))
 
-
     @app.route("/caretakers", methods=["POST"])
     def signup_caretaker_post():
         name = request.form.get("name")
@@ -181,21 +177,27 @@ def init_app(app):
         email = request.form.get("email")
         phone = request.form.get("phone")
         password = request.form.get("password")
+
         if not name or not password or (not email and not phone):
             flash("All fields are required.")
             return redirect(url_for("signup_caretaker"))
+
         hashed_password = generate_password_hash(password)
+
         db = SessionLocal()
-        new_user = Caretaker(
-            name=name,
-            age=age,
-            email=email if email else None,
-            phone=phone if phone else None,
-            password_hash=hashed_password
-        )
-        db.add(new_user)
-        db.commit()
-        db.close()
+        try:
+            new_user = Caretaker(
+                name=name,
+                age=age,
+                email=email if email else None,
+                phone=phone if phone else None,
+                password_hash=hashed_password
+            )
+            db.add(new_user)
+            db.commit()
+        finally:
+            db.close()
+
         flash("Signup successful! Please log in.")
         return redirect(url_for("login_caretaker"))
 
@@ -208,174 +210,18 @@ def init_app(app):
         db = SessionLocal()
         try:
             if role == 'senior':
+                requests = db.query(HelpRequest).all()
+                accepted = db.query(Request).options(joinedload(Request.caretaker)).filter_by(senior_id=user_id).all()
                 user = db.query(Senior).filter_by(id=user_id).first()
-                return render_template('dashboard_senior.html', user=user)
-
+                return render_template('dashboard_senior.html', user=user, requests=requests, accepted=accepted)
             elif role == 'caretaker':
                 user = db.query(Caretaker).filter_by(id=user_id).first()
-
-                requests = (
-                    db.query(HelpRequest)
-                    .options(joinedload(HelpRequest.senior))
-                    .order_by(HelpRequest.created_at.desc())
-                    .all()
-                )
-                data = [
-                    {
-                        "id": r.id,
-                        "senior_id": r.senior_id,
-                        "title": r.title,
-                        "description": r.description,
-                        "category": r.category,
-                        "lat": r.lat,
-                        "lng": r.lng,
-                        "status": r.status,
-                        "created_at": r.created_at,
-                        "senior_name": r.senior.name if r.senior else "Unknown"
-                    }
-                    for r in requests
-                ]
-
-                accepted = (
-                    db.query(Request)
-                    .options(joinedload(Request.senior))
-                    .filter_by(caretaker_id=user_id)
-                    .all()
-                )
-                atad = [
-                    {
-                        "id": r.id,
-                        "senior_id": r.senior_id,
-                        "title": r.title,
-                        "description": r.description,
-                        "category": r.category,
-                        "lat": r.lat,
-                        "lng": r.lng,
-                        "status": r.status,
-                        "caretaker_id": r.caretaker_id,
-                        "senior_name": r.senior.name if r.senior else "Unknown"
-                    }
-                    for r in accepted
-                ]
-
-                return render_template(
-                    'dashboard_caretaker.html',
-                    user=user,
-                    requests=data,
-                    accepted=atad
-                )
-
+                requests = db.query(HelpRequest).options(joinedload(HelpRequest.senior)).order_by(HelpRequest.created_at.desc()).all()
+                accepted = db.query(Request).options(joinedload(Request.senior)).filter_by(caretaker_id=user_id).all()
+                return render_template('dashboard_caretaker.html', user=user, requests=requests, accepted=accepted)
         finally:
             db.close()
-
         return redirect('/login')
-
-
-
-    @app.route("/<path:filename>")
-    def serve_static(filename):
-        return send_from_directory('frontend', filename)
-
-    @app.route("/users", methods=["GET"])
-    def get_all_users():
-        db = SessionLocal()
-        try:
-            seniors = db.query(Senior).all()
-            caretakers = db.query(Caretaker).all()
-            hr = db.query(HelpRequest).all()
-            re = db.query(Request).all()
-        finally:
-            db.close()
-        data = {
-            "seniors": [
-                {
-                    "id": s.id,
-                    "name": s.name,
-                    "age": s.age,
-                    "email": s.email,
-                    "phone": s.phone,
-                    "password_hash": s.password_hash
-                }
-                for s in seniors
-            ],
-            "caretakers": [
-                {
-                    "id": c.id,
-                    "name": c.name,
-                    "age": c.age,
-                    "email": c.email,
-                    "phone": c.phone,
-                    "password_hash": c.password_hash
-                }
-                for c in caretakers
-            ],
-            "help_requests": [
-                {
-                    "id": r.id,
-                    "senior_id": r.senior_id,
-                    "title": r.title,
-                    "description": r.description,
-                    "category": r.category,
-                    "lat": r.lat,
-                    "lng": r.lng,
-                    "status": r.status,
-                    "created_at": r.created_at,
-                    "time": r.time,
-                }
-                for r in hr
-            ],
-            "requests": [
-                {
-                    "id": r.id,
-                    "senior_id": r.senior_id,
-                    "title": r.title,
-                    "description": r.description,
-                    "category": r.category,
-                    "lat": r.lat,
-                    "lng": r.lng,
-                    "status": r.status,
-                    "caretaker_id": r.caretaker_id,
-                    "time": r.time,
-                }
-                for r in re
-            ]        }
-        return jsonify(data)
-
-    @app.route("/request_help", methods=["GET", "POST"])
-    @login_required
-    @location_required
-    def request_help():
-        user_id = session.get("user_id")
-        if request.method == "POST":
-            title = request.form.get("title")
-            description = request.form.get("description")
-            category = request.form.get("category")
-            db = SessionLocal()
-            req = db.query(Senior).filter_by(id=user_id).first()
-            lat = req.lat
-            lng = req.lng
-            if not title or not description or not category or not lat or not lng:
-                flash("All fields are required!")
-                return redirect(url_for("request_help"))
-            db = SessionLocal()
-            try:
-                help_request = HelpRequest(
-                    senior_id=user_id,
-                    title=title,
-                    description=description,
-                    category=category,
-                    lat=lat,
-                    lng=lng
-                )
-                db.add(help_request)
-                db.commit()
-            finally:
-                db.close()
-            flash("Your help request has been submitted!")
-            return redirect(url_for("dashboard"))
-        db = SessionLocal()
-        user = db.query(Senior).filter_by(id=user_id).first()
-        return render_template("request_help.html", user=user)
 
     @app.route("/set_location", methods=["GET", "POST"])
     @login_required
@@ -401,61 +247,4 @@ def init_app(app):
                     return redirect(url_for("dashboard"))
         finally:
             db.close()
-
-        # Re-query in case of GET to pass to template
-        db = SessionLocal()
-        try:
-            if role == "senior":
-                user = db.query(Senior).filter_by(id=user_id).first()
-            elif role == "caretaker":
-                user = db.query(Caretaker).filter_by(id=user_id).first()
-        finally:
-            db.close()
-
         return render_template("set_location.html", user=user)
-
-
-    @app.route('/get_senior', methods=['POST'])
-    def get_senior():
-        senior_id = request.json.get('id')
-        db = SessionLocal()
-        try:
-            senior = db.query(Senior).filter_by(id=senior_id).first()
-            if not senior:
-                return jsonify({"error": "Senior not found"}), 404
-            return jsonify({"name": senior.name, "age": senior.age, "email": senior.email, "phone": senior.phone})
-        finally:
-            db.close()
-
-    @app.route('/accept_request', methods=['POST'])
-    def accept_request():
-        id = request.form.get("id")
-        db = SessionLocal()
-        req = db.query(HelpRequest).filter_by(id=id).first()
-        #First we need to create a item in the database Request with the information from the item in HelpRequest
-        new_user = Request(
-            senior_id=req.senior_id,
-            title=req.title,
-            description=req.description,
-            category=req.category,
-            lat=req.lat,
-            lng=req.lng,
-            caretaker_id=session.get("user_id"),
-            time=req.time,
-        )
-        db.add(new_user)
-        db.delete(req)
-        db.commit()
-        db.close()
-        return redirect(url_for('dashboard'))
-    @app.route('/request_history', methods =['GET', 'POST'])
-    @login_required
-    def show_request_history():
-        user_id = session.get('user_id')
-        db = SessionLocal()
-
-        # Get all help requests made by this senior
-        requests = db.query(HelpRequest).filter_by(senior_id=user_id).order_by(HelpRequest.created_at.desc()).all()
-
-        db.close()
-        return render_template('request_history.html', requests=requests)
