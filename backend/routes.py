@@ -31,7 +31,7 @@ def location_required(f):
             elif user_role == "caretaker":
                 user = db.query(Caretaker).filter_by(id=user_id).first()
             if not user or user.lat is None or user.lng is None:
-                flash("Please set your la first!")
+                flash("Please set your location first!")
                 return redirect(url_for("set_location"))
         finally:
             db.close()
@@ -39,6 +39,7 @@ def location_required(f):
     return decorated
 
 def init_app(app):
+
     @app.route("/")
     def home():
         return render_template("index.html")
@@ -74,22 +75,30 @@ def init_app(app):
             email = request.form.get("email")
             phone = request.form.get("phone")
             password = request.form.get("password")
+
             db = SessionLocal()
             try:
                 user = None
                 if email:
                     user = db.query(Senior).filter(Senior.email == email).first()
-                if phone and not user:
+                elif phone:
                     user = db.query(Senior).filter(Senior.phone == phone).first()
-            finally:
-                db.close()
-            if user and check_password_hash(user.password_hash, password):
+
+                if not user:
+                    flash("Account not found.")
+                    return redirect(url_for("login_senior"))
+
+                if not check_password_hash(user.password_hash, password):
+                    flash("Incorrect password.")
+                    return redirect(url_for("login_senior"))
+
                 session["user_id"] = user.id
                 session["user_name"] = user.name
                 session["user_role"] = "senior"
                 return redirect(url_for("dashboard"))
-            flash("Invalid credentials")
-            return redirect(url_for("login_senior"))
+            finally:
+                db.close()
+
         return render_template("login_senior.html")
 
     @app.route("/login_caretaker", methods=["GET", "POST"])
@@ -98,22 +107,30 @@ def init_app(app):
             email = request.form.get("email")
             phone = request.form.get("phone")
             password = request.form.get("password")
+
             db = SessionLocal()
             try:
                 caretaker = None
                 if email:
                     caretaker = db.query(Caretaker).filter(Caretaker.email == email).first()
-                if phone and not caretaker:
+                elif phone:
                     caretaker = db.query(Caretaker).filter(Caretaker.phone == phone).first()
-            finally:
-                db.close()
-            if caretaker and check_password_hash(caretaker.password_hash, password):
+
+                if not caretaker:
+                    flash("Account not found.")
+                    return redirect(url_for("login_caretaker"))
+
+                if not check_password_hash(caretaker.password_hash, password):
+                    flash("Incorrect password.")
+                    return redirect(url_for("login_caretaker"))
+
                 session["user_id"] = caretaker.id
                 session["user_name"] = caretaker.name
                 session["user_role"] = "caretaker"
                 return redirect(url_for("dashboard"))
-            flash("Invalid credentials")
-            return redirect(url_for("login_caretaker"))
+            finally:
+                db.close()
+
         return render_template("login_caretaker.html")
 
     @app.route("/users", methods=["POST"])
@@ -123,21 +140,33 @@ def init_app(app):
         email = request.form.get("email")
         phone = request.form.get("phone")
         password = request.form.get("password")
+
         if not name or not password or (not email and not phone):
             flash("All fields are required.")
             return redirect(url_for("signup_senior"))
-        hashed_password = generate_password_hash(password)
+
         db = SessionLocal()
-        new_user = Senior(
-            name=name,
-            age=age,
-            email=email if email else None,
-            phone=phone if phone else None,
-            password_hash=hashed_password
-        )
-        db.add(new_user)
-        db.commit()
-        db.close()
+        try:
+            existing = db.query(Senior).filter(
+                (Senior.email == email) | (Senior.phone == phone)
+            ).first()
+            if existing:
+                flash("Account with this email or phone already exists.")
+                return redirect(url_for("signup_senior"))
+
+            hashed_password = generate_password_hash(password)
+            new_user = Senior(
+                name=name,
+                age=age,
+                email=email if email else None,
+                phone=phone if phone else None,
+                password_hash=hashed_password
+            )
+            db.add(new_user)
+            db.commit()
+        finally:
+            db.close()
+
         flash("Signup successful! Please log in.")
         return redirect(url_for("login_senior"))
 
@@ -148,110 +177,51 @@ def init_app(app):
         email = request.form.get("email")
         phone = request.form.get("phone")
         password = request.form.get("password")
+
         if not name or not password or (not email and not phone):
             flash("All fields are required.")
             return redirect(url_for("signup_caretaker"))
+
         hashed_password = generate_password_hash(password)
+
         db = SessionLocal()
-        new_user = Caretaker(
-            name=name,
-            age=age,
-            email=email if email else None,
-            phone=phone if phone else None,
-            password_hash=hashed_password
-        )
-        db.add(new_user)
-        db.commit()
-        db.close()
+        try:
+            new_user = Caretaker(
+                name=name,
+                age=age,
+                email=email if email else None,
+                phone=phone if phone else None,
+                password_hash=hashed_password
+            )
+            db.add(new_user)
+            db.commit()
+        finally:
+            db.close()
+
         flash("Signup successful! Please log in.")
         return redirect(url_for("login_caretaker"))
 
     @app.route('/dashboard')
     @login_required
+    @location_required
     def dashboard():
         user_id = session.get("user_id")
         role = session.get("user_role")
         db = SessionLocal()
         try:
             if role == 'senior':
-                requests = db.query(HelpRequest).filter_by(senior_id=user_id).all()
-                data = [
-                    {
-                        "id": r.id,
-                        "senior_id": r.senior_id,
-                        "title": r.title,
-                        "description": r.description,
-                        "category": r.category,
-                        "time": r.time,
-                        "lat": r.lat,
-                        "lng": r.lng,
-                        "status": r.status,
-                        "created_at": r.created_at
-                    }
-                    for r in requests
-                ]
+                requests = db.query(HelpRequest).all()
                 accepted = db.query(Request).options(joinedload(Request.caretaker)).filter_by(senior_id=user_id).all()
-                print("ACCEPTED:", accepted)
-                atad = [
-                    {
-                        "id": r.id,
-                        "senior_id": r.senior_id,
-                        "title": r.title,
-                        "description": r.description,
-                        "time": r.time,
-                        "category": r.category,
-                        "lat": r.lat,
-                        "lng": r.lng,
-                        "status": r.status,
-                        "caretaker_id": r.caretaker_id,
-                        "caretaker_name": r.caretaker.name
-                    }
-                    for r in accepted
-                ]
                 user = db.query(Senior).filter_by(id=user_id).first()
-                return render_template('dashboard_senior.html', user=user, requests=data, accepted=atad)
+                return render_template('dashboard_senior.html', user=user, requests=requests, accepted=accepted)
             elif role == 'caretaker':
-                requests = db.query(HelpRequest).options(joinedload(HelpRequest.senior)).all()
-                data = [
-                    {
-                        "id": r.id,
-                        "senior_id": r.senior_id,
-                        "title": r.title,
-                        "description": r.description,
-                        "category": r.category,
-                        "time": r.time,
-                        "lat": r.lat,
-                        "lng": r.lng,
-                        "status": r.status,
-                        "created_at": r.created_at,
-                        "senior_name": r.senior.name
-                    }
-                    for r in requests
-                ]
-                accepted = db.query(Request).options(joinedload(Request.senior)).filter_by(caretaker_id=user_id).all()
-                print("ACCEPTED:", accepted)
-                atad = [
-                    {
-                        "id": r.id,
-                        "senior_id": r.senior_id,
-                        "title": r.title,
-                        "description": r.description,
-                        "category": r.category,
-                        "lat": r.lat,
-                        "time": r.time,
-                        "lng": r.lng,
-                        "status": r.status,
-                        "caretaker_id": r.caretaker_id,
-                        "senior_name": r.senior.name
-                    }
-                    for r in accepted
-                ]
                 user = db.query(Caretaker).filter_by(id=user_id).first()
-                return render_template('dashboard_caretaker.html', user=user, requests=data, accepted=atad)
+                requests = db.query(HelpRequest).options(joinedload(HelpRequest.senior)).order_by(HelpRequest.created_at.desc()).all()
+                accepted = db.query(Request).options(joinedload(Request.senior)).filter_by(caretaker_id=user_id).all()
+                return render_template('dashboard_caretaker.html', user=user, requests=requests, accepted=accepted)
         finally:
             db.close()
         return redirect('/login')
-
 
     @app.route("/<path:filename>")
     def serve_static(filename):
@@ -376,9 +346,15 @@ def init_app(app):
     @login_required
     def set_location():
         user_id = session.get("user_id")
+        role = session.get("user_role")
         db = SessionLocal()
         try:
-            user = db.query(Senior).filter_by(id=user_id).first()
+            user = None
+            if role == "senior":
+                user = db.query(Senior).filter_by(id=user_id).first()
+            elif role == "caretaker":
+                user = db.query(Caretaker).filter_by(id=user_id).first()
+
             if request.method == "POST":
                 lat = request.form.get("lat")
                 lng = request.form.get("lng")
@@ -390,7 +366,6 @@ def init_app(app):
                     return redirect(url_for("dashboard"))
         finally:
             db.close()
-        user = db.query(Senior).filter_by(id=user_id).first()
         return render_template("set_location.html", user=user)
 
     @app.route('/get_senior', methods=['POST'])
@@ -477,4 +452,5 @@ def init_app(app):
         db = SessionLocal()
         user_id = session.get("user_id")
         user = db.query(Senior).filter_by(id=user_id).first()
+
         return render_template("feedback.html", user=user, request_id=int(request_id))
