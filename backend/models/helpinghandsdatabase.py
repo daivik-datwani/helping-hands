@@ -46,8 +46,7 @@ class HelpRequest(Base):
     lng = Column(Float, nullable=True)
     status = Column(String, default="Pending")
     created_at = Column(DateTime, default=datetime.utcnow)
-    time = Column(DateTime)
-    
+    time = Column(String)  # changed from DateTime → String to match form data
 
     senior = relationship("Senior", back_populates="help_requests")
 
@@ -56,7 +55,6 @@ class Request(Base):
     __tablename__ = "requests"
 
     id = Column(Integer, primary_key=True, index=True)
-    time = Column(DateTime, default=datetime.utcnow)
     senior_id = Column(Integer, ForeignKey("seniors.id"))
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
@@ -65,7 +63,7 @@ class Request(Base):
     lng = Column(Float, nullable=False)
     status = Column(String, default="Pending")
     caretaker_id = Column(Integer, ForeignKey("caretakers.id"))
-    time = Column(DateTime)
+    time = Column(String)  # keep consistent with HelpRequest.time
 
     senior = relationship("Senior", back_populates="requests")
     caretaker = relationship("Caretaker", back_populates="requests")
