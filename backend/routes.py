@@ -182,6 +182,7 @@ def init_app(app):
                         "title": r.title,
                         "description": r.description,
                         "category": r.category,
+                        "time": r.time,
                         "lat": r.lat,
                         "lng": r.lng,
                         "status": r.status,
@@ -197,6 +198,7 @@ def init_app(app):
                         "senior_id": r.senior_id,
                         "title": r.title,
                         "description": r.description,
+                        "time": r.time,
                         "category": r.category,
                         "lat": r.lat,
                         "lng": r.lng,
@@ -217,6 +219,7 @@ def init_app(app):
                         "title": r.title,
                         "description": r.description,
                         "category": r.category,
+                        "time": r.time,
                         "lat": r.lat,
                         "lng": r.lng,
                         "status": r.status,
@@ -235,6 +238,7 @@ def init_app(app):
                         "description": r.description,
                         "category": r.category,
                         "lat": r.lat,
+                        "time": r.time,
                         "lng": r.lng,
                         "status": r.status,
                         "caretaker_id": r.caretaker_id,
@@ -331,6 +335,7 @@ def init_app(app):
             req = db.query(Senior).filter_by(id=user_id).first()
             lat = req.lat
             lng = req.lng
+            time = request.form.get("time")
             if not title or not description or not category or not lat or not lng:
                 flash("All fields are required!")
                 return redirect(url_for("request_help"))
@@ -342,7 +347,8 @@ def init_app(app):
                     description=description,
                     category=category,
                     lat=lat,
-                    lng=lng
+                    lng=lng,
+                    time=time
                 )
                 db.add(help_request)
                 db.commit()
