@@ -23,60 +23,88 @@
         <li><strong>Phone:</strong> {{ user.phone }}</li>
       </ul>
     </section>
-
-    <section class="stripe" style="margin-top:38px;">
-      <h2 class="hero-title" style="font-size:2em;">🆘 Request Help</h2>
-      <p>Need assistance? Create a new help request to connect with available caregivers.</p>
-      <!-- Add help request button here if needed -->
-    </section>
-
+    <br>
     <section class="stripe">
-      <h2 class="hero-title" style="font-size:2em;">📋 Your Upcoming Requests</h2>
+      <h2 class="hero-title" style="font-size:2em;">🆘 Requests</h2>
       <button type="button" class="btn primary" onclick="window.open('/request_help','_self')">Request Help</button>
       {% if requests and requests|length > 0 %}
         <div class="stripe-grid">
         {% for request in requests %}
           <div class="stripe-card">
-            <strong>{{ request.service_type }}</strong><br>
-            <strong>Date:</strong> {{ request.date }}<br>
+            <strong>{{ request.title }}</strong><br>
+            {{ request.category }}<br>
             <strong>Time:</strong> {{ request.time }}<br>
             <strong>Description:</strong> {{ request.description }}<br>
-            {% if request.caregiver_name %}
-            <strong>Caregiver:</strong> {{ request.caregiver_name }}<br>
+            {% if request.caretaker_name %}
+              <strong>Caretaker:</strong>
+              <button onclick="loadCaretakerDetails({{ request.caretaker_id }}, this)">
+                {{ request.caretaker_name }}
+              </button>
+              <div class="caretaker-details"></div>
+              <br>
             {% endif %}
             <strong>Status:</strong> {{ request.status|title }}
-          </div>
+        </div>
         {% endfor %}
         </div>
       {% else %}
-        <p>You have no upcoming requests. Click "Request Help" to create one!</p>
+        <p>No requests. Click the button to send one!</p>
       {% endif %}
-    </section>
-
-    <section class="stripe">
-      <h2 class="hero-title" style="font-size:2em;">👨‍⚕️ Your Caregivers</h2>
-      {% if caregivers and caregivers|length > 0 %}
+      <h2 class="hero-title" style="font-size:2em;">📋 Your Accepted Requests</h2>
+      {% if accepted and accepted|length > 0 %}
         <div class="stripe-grid">
-        {% for caregiver in caregivers %}
+        {% for accept in accepted %}
           <div class="stripe-card">
-            <strong>Name:</strong> {{ caregiver.name }}<br>
-            <strong>Specialization:</strong> {{ caregiver.specialization }}<br>
-            <strong>Experience:</strong> {{ caregiver.experience }} years<br>
-            <strong>Contact:</strong> {{ caregiver.phone }}<br>
-            {% if caregiver.next_available %}
-            <strong>Next Available:</strong> {{ caregiver.next_available }}<br>
+            <strong>{{ accept.title }}</strong><br>
+            {{ accept.category }}<br>
+            <strong>Time:</strong> {{ accept.time }}<br>
+            <strong>Description:</strong> {{ accept.description }}<br>
+            {% if accept.caretaker_name %}
+              <strong>Caretaker:</strong>
+              <button onclick="loadCaretakerDetails({{ accept.caretaker_id }}, this)">
+                {{ accept.caretaker_name }}
+              </button>
+              <div class="caretaker-details"></div>
+              <br>
+            {% endif %}
+            <strong>Status:</strong> {{ accept.status|title }}
+            {% if accept.status == "Pending" %}
+              <form action="/done" method="post"><button type="submit" class="btn primary" name="id" value="{{ accept.id }}">Done</button></form>
             {% endif %}
           </div>
         {% endfor %}
         </div>
       {% else %}
-        <p>No caregivers assigned yet. Browse available caregivers to get started!</p>
+        <p>You have no accepted requests yet. Accept a request to get started!</p>
       {% endif %}
     </section>
-
     <div style="text-align:right;">
       <a href="/logout" class="btn primary logout-button">Logout</a>
     </div>
+    <script>
+    async function loadCaretakerDetails(caretakerId, btn) {
+    const response = await fetch('/get_caretaker', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: caretakerId })
+    });
+    const data = await response.json();
+    if (data.error) {
+      alert(data.error);
+      return;
+    }
+
+    const details = btn.nextElementSibling; // targets the div right after the button
+    details.innerHTML = `
+      <div class="stripe-card">
+        <h3>${data.name}</h3>
+        <p><strong>Age:</strong> ${data.age}</p>
+        <p><strong>Email:</strong> ${data.email}</p>
+        <p><strong>Phone:</strong> ${data.phone}</p>
+      </div>
+    `;
+    }
+    </script>
   </div>
 </body>
 </html>

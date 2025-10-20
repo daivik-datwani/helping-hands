@@ -174,10 +174,41 @@ def init_app(app):
         db = SessionLocal()
         try:
             if role == 'senior':
+                requests = db.query(HelpRequest).all()
+                data = [
+                    {
+                        "id": r.id,
+                        "senior_id": r.senior_id,
+                        "title": r.title,
+                        "description": r.description,
+                        "category": r.category,
+                        "lat": r.lat,
+                        "lng": r.lng,
+                        "status": r.status,
+                        "created_at": r.created_at
+                    }
+                    for r in requests
+                ]
+                accepted = db.query(Request).options(joinedload(Request.caretaker)).filter_by(senior_id=user_id).all()
+                print("ACCEPTED:", accepted)
+                atad = [
+                    {
+                        "id": r.id,
+                        "senior_id": r.senior_id,
+                        "title": r.title,
+                        "description": r.description,
+                        "category": r.category,
+                        "lat": r.lat,
+                        "lng": r.lng,
+                        "status": r.status,
+                        "caretaker_id": r.caretaker_id,
+                        "caretaker_name": r.caretaker.name
+                    }
+                    for r in accepted
+                ]
                 user = db.query(Senior).filter_by(id=user_id).first()
-                return render_template('dashboard_senior.html', user=user)
+                return render_template('dashboard_senior.html', user=user, requests=data, accepted=atad)
             elif role == 'caretaker':
-                user = db.query(Caretaker).filter_by(id=user_id).first()
                 requests = db.query(HelpRequest).options(joinedload(HelpRequest.senior)).all()
                 data = [
                     {
@@ -211,6 +242,7 @@ def init_app(app):
                     }
                     for r in accepted
                 ]
+                user = db.query(Caretaker).filter_by(id=user_id).first()
                 return render_template('dashboard_caretaker.html', user=user, requests=data, accepted=atad)
         finally:
             db.close()
@@ -352,6 +384,18 @@ def init_app(app):
             if not senior:
                 return jsonify({"error": "Senior not found"}), 404
             return jsonify({"name": senior.name, "age": senior.age, "email": senior.email, "phone": senior.phone})
+        finally:
+            db.close()
+
+    @app.route('/get_caretaker', methods=['POST'])
+    def get_caretaker():
+        caretaker_id = request.json.get('id')
+        db = SessionLocal()
+        try:
+            caretaker = db.query(Caretaker).filter_by(id=caretaker_id).first()
+            if not caretaker:
+                return jsonify({"error": "Caretaker not found"}), 404
+            return jsonify({"name": caretaker.name, "age": caretaker.age, "email": caretaker.email, "phone": caretaker.phone})
         finally:
             db.close()
 
