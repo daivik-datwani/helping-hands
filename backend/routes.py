@@ -1,6 +1,6 @@
 from flask import *
 from backend.db import SessionLocal
-from backend.models.helpinghandsdatabase import Senior, Caretaker, HelpRequest, Request
+from backend.models.helpinghandsdatabase import Senior, Caretaker, HelpRequest, Request, Feedback
 from werkzeug.security import generate_password_hash, check_password_hash
 from backend.helpers import *
 from sqlalchemy.orm import joinedload
@@ -98,7 +98,6 @@ def init_app(app):
                 return redirect(url_for("dashboard"))
             finally:
                 db.close()
-
         return render_template("login_senior.html")
 
     @app.route("/login_caretaker", methods=["GET", "POST"])
@@ -130,7 +129,6 @@ def init_app(app):
                 return redirect(url_for("dashboard"))
             finally:
                 db.close()
-
         return render_template("login_caretaker.html")
 
     @app.route("/users", methods=["POST"])
@@ -147,21 +145,14 @@ def init_app(app):
 
         db = SessionLocal()
         try:
-            existing = db.query(Senior).filter(
-                (Senior.email == email) | (Senior.phone == phone)
-            ).first()
+            existing = db.query(Senior).filter((Senior.email == email) | (Senior.phone == phone)).first()
             if existing:
                 flash("Account with this email or phone already exists.")
                 return redirect(url_for("signup_senior"))
 
             hashed_password = generate_password_hash(password)
-            new_user = Senior(
-                name=name,
-                age=age,
-                email=email if email else None,
-                phone=phone if phone else None,
-                password_hash=hashed_password
-            )
+            new_user = Senior(name=name, age=age, email=email if email else None,
+                              phone=phone if phone else None, password_hash=hashed_password)
             db.add(new_user)
             db.commit()
         finally:
@@ -186,13 +177,8 @@ def init_app(app):
 
         db = SessionLocal()
         try:
-            new_user = Caretaker(
-                name=name,
-                age=age,
-                email=email if email else None,
-                phone=phone if phone else None,
-                password_hash=hashed_password
-            )
+            new_user = Caretaker(name=name, age=age, email=email if email else None,
+                                 phone=phone if phone else None, password_hash=hashed_password)
             db.add(new_user)
             db.commit()
         finally:
@@ -248,8 +234,6 @@ def init_app(app):
         finally:
             db.close()
         return render_template("set_location.html", user=user)
-<<<<<<< HEAD
-=======
 
     @app.route('/get_senior', methods=['POST'])
     def get_senior():
@@ -263,77 +247,63 @@ def init_app(app):
         finally:
             db.close()
 
-    @app.route('/get_caretaker', methods=['POST'])
-    def get_caretaker():
-        caretaker_id = request.json.get('id')
-        db = SessionLocal()
-        try:
-            caretaker = db.query(Caretaker).filter_by(id=caretaker_id).first()
-            if not caretaker:
-                return jsonify({"error": "Caretaker not found"}), 404
-            return jsonify({"name": caretaker.name, "age": caretaker.age, "email": caretaker.email, "phone": caretaker.phone})
-        finally:
-            db.close()
-
     @app.route('/accept_request', methods=['POST'])
     def accept_request():
         id = request.form.get("id")
         db = SessionLocal()
-        req = db.query(HelpRequest).filter_by(id=id).first()
-        new_user = Request(
-            senior_id=req.senior_id,
-            title=req.title,
-            description=req.description,
-            category=req.category,
-            lat=req.lat,
-            lng=req.lng,
-            caretaker_id=session.get("user_id"),
-            time=req.time,
-        )
-        db.add(new_user)
-        db.delete(req)
-        db.commit()
-        db.close()
+        try:
+            req = db.query(HelpRequest).filter_by(id=id).first()
+            new_req = Request(
+                senior_id=req.senior_id,
+                title=req.title,
+                description=req.description,
+                category=req.category,
+                lat=req.lat,
+                lng=req.lng,
+                caretaker_id=session.get("user_id"),
+                time=req.time,
+            )
+            db.add(new_req)
+            db.delete(req)
+            db.commit()
+        finally:
+            db.close()
         return redirect(url_for('dashboard'))
 
     @app.route('/done', methods=['POST'])
     def done():
         id = request.form.get("id")
         db = SessionLocal()
-        req = db.query(Request).filter_by(id=id).first()
-        req.status = "Completed"
-        db.commit()
-        db.close()
+        try:
+            req = db.query(Request).filter_by(id=id).first()
+            req.status = "Completed"
+            db.commit()
+        finally:
+            db.close()
         return redirect(url_for('feedback'))
 
     @app.route('/feedback', methods=['GET', 'POST'])
     def feedback():
-        if request.method == "POST":
-            request_id = request.form.get("request_id")
-            db = SessionLocal()
-            req = db.query(Request).filter_by(id=request_id).first()
-            senior_id = req.senior_id
-            caretaker_id = req.caretaker_id
-            comment = request.form.get("comment")
-            rating = request.form.get("rating")
-            time = request.form.get("time")
-            db.close()
-            db = SessionLocal()
-            try:
-                feedback = Feedback(
-                    senior_id=senior_id,
-                    caretaker_id=caretaker_id,
+        user_id = session.get("user_id")
+        db = SessionLocal()
+        try:
+            if request.method == "POST":
+                request_id = request.form.get("request_id")
+                req = db.query(Request).filter_by(id=request_id).first()
+                comment = request.form.get("comment")
+                rating = request.form.get("rating")
+                time = request.form.get("time")
+                fb = Feedback(
+                    senior_id=req.senior_id,
+                    caretaker_id=req.caretaker_id,
                     comment=comment,
                     rating=rating,
                     request_id=request_id,
                     time=time
                 )
-                db.add(feedback)
+                db.add(fb)
                 db.commit()
-            finally:
-                db.close()
-        db = SessionLocal()
-        user_id = session.get("user_id")
-        user = db.query(Senior).filter_by(id=user_id).first()
+            user = db.query(Senior).filter_by(id=user_id).first()
+        finally:
+            db.close()
         return render_template("feedback.html", user=user)
->>>>>>> 0eccf5a75c302d0541c4168b7547141765da1035
