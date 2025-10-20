@@ -38,12 +38,12 @@
             <option value="Other">Other</option>
           </select>
 
-          <label for="datetime">Date &amp; Time Needed</label>
-          <input id="datetime" name="datetime" type="datetime-local" required>
+          <label for="time">Date &amp; Time Needed</label>
+          <input id="time" name="time" type="datetime-local" required>
 
           <label for="location">Location</label>
           Send to Lat:{{ user.lat }} Long:{{ user.lng }}
-          <button type="button" class="btn muted" onclick="window.open("set_location.html", "_self")">Change Location</button>
+          <button type="button" class="btn muted" onclick="window.open('set_location.html', '_self')">Change Location</button>
           <button class="btn primary" type="submit">Submit Request</button>
         </form>
 
