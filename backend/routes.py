@@ -421,7 +421,7 @@ def init_app(app):
                     rating=rating,
                     request_id=request_id,
                 )
-                db.add(fb)
+                db.add(feedback)
                 db.commit()
             finally:
                 db.close()
