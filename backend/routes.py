@@ -1,6 +1,7 @@
 from flask import *
 from backend.db import SessionLocal
 from backend.models.helpinghandsdatabase import Senior, Caretaker, HelpRequest, Request, Feedback
+from backend.models.helpinghandsdatabase import Senior, Caretaker, HelpRequest, Request, Feedback
 from werkzeug.security import generate_password_hash, check_password_hash
 from backend.helpers import *
 from sqlalchemy.orm import joinedload
@@ -209,6 +210,125 @@ def init_app(app):
             db.close()
         return redirect('/login')
 
+    @app.route("/<path:filename>")
+    def serve_static(filename):
+        return send_from_directory('frontend', filename)
+
+    @app.route("/users", methods=["GET"])
+    def get_all_users():
+        db = SessionLocal()
+        try:
+            seniors = db.query(Senior).all()
+            caretakers = db.query(Caretaker).all()
+            hr = db.query(HelpRequest).all()
+            re = db.query(Request).all()
+            feedback = db.query(Feedback).all()
+        finally:
+            db.close()
+        data = {
+            "seniors": [
+                {
+                    "id": s.id,
+                    "name": s.name,
+                    "age": s.age,
+                    "email": s.email,
+                    "phone": s.phone,
+                    "password_hash": s.password_hash
+                }
+                for s in seniors
+            ],
+            "caretakers": [
+                {
+                    "id": c.id,
+                    "name": c.name,
+                    "age": c.age,
+                    "email": c.email,
+                    "phone": c.phone,
+                    "password_hash": c.password_hash
+                }
+                for c in caretakers
+            ],
+            "help_requests": [
+                {
+                    "id": r.id,
+                    "senior_id": r.senior_id,
+                    "title": r.title,
+                    "description": r.description,
+                    "category": r.category,
+                    "lat": r.lat,
+                    "lng": r.lng,
+                    "status": r.status,
+                    "created_at": r.created_at,
+                    "time": r.time,
+                }
+                for r in hr
+            ],
+            "requests": [
+                {
+                    "id": r.id,
+                    "senior_id": r.senior_id,
+                    "title": r.title,
+                    "description": r.description,
+                    "category": r.category,
+                    "lat": r.lat,
+                    "lng": r.lng,
+                    "status": r.status,
+                    "caretaker_id": r.caretaker_id,
+                    "time": r.time,
+                }
+                for r in re
+            ],
+            "feedback": [
+                {
+                    "id": f.id,
+                    "senior_id": f.senior_id,
+                    "request_id": f.request_id,
+                    "comment": f.comment,
+                    "rating": f.rating,
+                    "caretaker_id": f.caretaker_id,
+                }
+                for f in feedback
+            ]        }
+        return jsonify(data)
+
+    @app.route("/request_help", methods=["GET", "POST"])
+    @login_required
+    @location_required
+    def request_help():
+        user_id = session.get("user_id")
+        if request.method == "POST":
+            title = request.form.get("title")
+            description = request.form.get("description")
+            category = request.form.get("category")
+            db = SessionLocal()
+            req = db.query(Senior).filter_by(id=user_id).first()
+            lat = req.lat
+            lng = req.lng
+            time = request.form.get("time")
+            if not title or not description or not category or not lat or not lng:
+                flash("All fields are required!")
+                return redirect(url_for("request_help"))
+            db = SessionLocal()
+            try:
+                help_request = HelpRequest(
+                    senior_id=user_id,
+                    title=title,
+                    description=description,
+                    category=category,
+                    lat=lat,
+                    lng=lng,
+                    time=time
+                )
+                db.add(help_request)
+                db.commit()
+            finally:
+                db.close()
+            flash("Your help request has been submitted!")
+            return redirect(url_for("dashboard"))
+        db = SessionLocal()
+        user = db.query(Senior).filter_by(id=user_id).first()
+        return render_template("request_help.html", user=user)
+
     @app.route("/set_location", methods=["GET", "POST"])
     @login_required
     def set_location():
@@ -274,36 +394,40 @@ def init_app(app):
     def done():
         id = request.form.get("id")
         db = SessionLocal()
-        try:
-            req = db.query(Request).filter_by(id=id).first()
-            req.status = "Completed"
-            db.commit()
-        finally:
-            db.close()
-        return redirect(url_for('feedback'))
+        req = db.query(Request).filter_by(id=id).first()
+        req.status = "Completed"
+        db.commit()
+        db.close()
+        return redirect(url_for('feedback', request_id=id))
 
     @app.route('/feedback', methods=['GET', 'POST'])
     def feedback():
-        user_id = session.get("user_id")
-        db = SessionLocal()
-        try:
-            if request.method == "POST":
-                request_id = request.form.get("request_id")
-                req = db.query(Request).filter_by(id=request_id).first()
-                comment = request.form.get("comment")
-                rating = request.form.get("rating")
-                time = request.form.get("time")
-                fb = Feedback(
-                    senior_id=req.senior_id,
-                    caretaker_id=req.caretaker_id,
+        request_id = request.args.get("request_id")
+        if request.method == "POST":
+            request_id = request.form.get("request_id")
+            db = SessionLocal()
+            req = db.query(Request).filter_by(id=request_id).first()
+            senior_id = req.senior_id
+            caretaker_id = req.caretaker_id
+            comment = request.form.get("comment")
+            rating = request.form.get("rating")
+            db.close()
+            db = SessionLocal()
+            try:
+                feedback = Feedback(
+                    senior_id=senior_id,
+                    caretaker_id=caretaker_id,
                     comment=comment,
                     rating=rating,
                     request_id=request_id,
-                    time=time
                 )
                 db.add(fb)
                 db.commit()
-            user = db.query(Senior).filter_by(id=user_id).first()
-        finally:
-            db.close()
-        return render_template("feedback.html", user=user)
+            finally:
+                db.close()
+            return redirect(url_for('dashboard'))
+        db = SessionLocal()
+        user_id = session.get("user_id")
+        user = db.query(Senior).filter_by(id=user_id).first()
+
+        return render_template("feedback.html", user=user, request_id=int(request_id))

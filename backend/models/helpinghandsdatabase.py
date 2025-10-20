@@ -75,7 +75,6 @@ class Feedback(Base):
     __tablename__ = "feedback"
 
     id = Column(Integer, primary_key=True, index=True)
-    time = Column(DateTime, default=datetime.utcnow)
     senior_id = Column(Integer, ForeignKey("seniors.id"))
     request_id = Column(Integer, ForeignKey("requests.id"))
     comment = Column(String, nullable=False)
