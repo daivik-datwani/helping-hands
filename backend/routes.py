@@ -1,6 +1,6 @@
 from flask import *
 from backend.db import SessionLocal
-from backend.models.helpinghandsdatabase import Senior, Caretaker, HelpRequest, Request
+from backend.models.helpinghandsdatabase import Senior, Caretaker, HelpRequest, Request, Feedback
 from werkzeug.security import generate_password_hash, check_password_hash
 from backend.helpers import *
 from sqlalchemy.orm import joinedload
@@ -265,6 +265,7 @@ def init_app(app):
             caretakers = db.query(Caretaker).all()
             hr = db.query(HelpRequest).all()
             re = db.query(Request).all()
+            feedback = db.query(Feedback).all()
         finally:
             db.close()
         data = {
@@ -319,6 +320,17 @@ def init_app(app):
                     "time": r.time,
                 }
                 for r in re
+            ],
+            "feedback": [
+                {
+                    "id": f.id,
+                    "senior_id": f.senior_id,
+                    "request_id": f.request_id,
+                    "comment": f.comment,
+                    "rating": f.rating,
+                    "caretaker_id": f.caretaker_id,
+                }
+                for f in feedback
             ]        }
         return jsonify(data)
 
@@ -434,10 +446,11 @@ def init_app(app):
         req.status = "Completed"
         db.commit()
         db.close()
-        return redirect(url_for('feedback'))
+        return redirect(url_for('feedback', request_id=id))
 
     @app.route('/feedback', methods=['GET', 'POST'])
     def feedback():
+        request_id = request.args.get("request_id")
         if request.method == "POST":
             request_id = request.form.get("request_id")
             db = SessionLocal()
@@ -446,7 +459,6 @@ def init_app(app):
             caretaker_id = req.caretaker_id
             comment = request.form.get("comment")
             rating = request.form.get("rating")
-            time = request.form.get("time")
             db.close()
             db = SessionLocal()
             try:
@@ -456,13 +468,13 @@ def init_app(app):
                     comment=comment,
                     rating=rating,
                     request_id=request_id,
-                    time=time
                 )
                 db.add(feedback)
                 db.commit()
             finally:
                 db.close()
+            return redirect(url_for('dashboard'))
         db = SessionLocal()
         user_id = session.get("user_id")
         user = db.query(Senior).filter_by(id=user_id).first()
-        return render_template("feedback.html", user=user)
+        return render_template("feedback.html", user=user, request_id=int(request_id))
