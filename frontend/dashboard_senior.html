@@ -55,22 +55,14 @@
             {{ request.category }}<br>
             <strong>Time:</strong> {{ request.time }}<br>
             <strong>Description:</strong> {{ request.description }}<br>
-            {% if request.caretaker_name %}
-              <strong>Caretaker:</strong>
-              <button onclick="loadCaretakerDetails({{ request.caretaker_id }}, this)">
-                {{ request.caretaker_name }}
-             </button>
-             <div class="caretaker-details"></div>
-             <div id="map-req-{{ loop.index }}" class="map"></div>
-             <br>
-             {% endif %}
-             <strong>Status:</strong> {{ request.status|title }}
+            <div id="map-req-{{ loop.index }}" class="map"></div>
+            <strong>Status:</strong> {{ request.status|title }}
          </div>
          {% endfor %}
          </div>
-       {% else %}
+      {% else %}
         <p>No requests. Click the button to send one!</p>
-       {% endif %}
+      {% endif %}
 
     <br>
 
@@ -78,28 +70,30 @@
     <section class="stripe">
       <h2 class="hero-title" style="font-size:2em;">📋 Your Completed Requests</h2>
       {% if accepted and accepted|length > 0 %}
-        <div class="stripe-grid">
-        {% for accept in accepted %}
-          <div class="stripe-card">
-            <strong>{{ accept.title }}</strong><br>
-            {{ accept.category }}<br>
-            <strong>Time:</strong> {{ accept.time }}<br>
-            <strong>Description:</strong> {{ accept.description }}<br>
-            <div id="map-comp-{{ loop.index }}" class="map"></div>
-
-            {% if accept.caretaker_name %}
+          <div class="stripe-grid">
+          {% for accept in accepted %}
+              <div class="stripe-card">
+              <strong>{{ accept.title }}</strong><br>
+              {{ accept.category }}<br>
+              <strong>Time:</strong> {{ accept.time }}<br>
+              <strong>Description:</strong> {{ accept.description }}<br>
+              <div id="map-comp-{{ loop.index }}" class="map"></div>
+              {% if accept.caretaker_name %}
+                  <br>
+                  <strong>Caretaker:</strong>
+                  <button onclick="loadCaretakerDetails({{ accept.caretaker_id }}, this)">
+                     {{ accept.caretaker_name }}
+                  </button>
+                  <div class="caretaker-details"></div>
+              {% endif %}
               <br>
-              <strong>Caretaker:</strong>
-              <button onclick="loadCaretakerDetails({{ accept.caretaker_id }}, this)">
-                {{ accept.caretaker_name }}
-              </button>
-              <div class="caretaker-details"></div>
-            {% endif %}
-            <br>
-            <strong>Status:</strong> {{ accept.status|title }}
+              <strong>Status:</strong> {{ accept.status|title }}
+              <form action="/done" method="post">
+                <button type="submit" class="btn primary" name="id" value="{{ accept.id }}">Done</button>
+              </form>
+            </div>
+          {% endfor %}
           </div>
-        {% endfor %}
-        </div>
       {% else %}
         <p>You have no accepted requests yet.</p>
       {% endif %}
