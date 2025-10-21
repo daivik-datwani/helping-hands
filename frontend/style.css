@@ -263,3 +263,19 @@ body {
     justify-content: center;
   }
 }
+
+.hero-visual img {
+  max-width: 600px;
+  max-height: 400px;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 26px;
+  box-shadow: var(--shadow-2);
+}
+@media (max-width: 768px) {
+  .hero-visual img {
+    max-width: 100%;
+    max-height: none;
+  }
+}
