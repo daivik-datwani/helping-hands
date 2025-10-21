@@ -44,20 +44,16 @@
 
   <!-- CURRENT OPEN REQUESTS -->
   <section class="stripe">
-    <h2 class="hero-title" style="font-size:2em;">🆕 Current Open Requests</h2>
+    <h2 class="hero-title" style="font-size:2em;"> Requests</h2>
     {% if requests and requests|length > 0 %}
-      <div class="stripe-grid">
-        {% for req in requests %}
+        <div class="stripe-grid">
+        {% for request in requests %}
           <div class="stripe-card">
-            <strong>{{ req.title }}</strong><br>
-            {{ req.category }}<br>
-            <strong>Time:</strong> {{ req.time }}<br>
-            <strong>Description:</strong> {{ req.description }}<br>
-            <div id="map-open-{{ loop.index }}" class="map"></div>
-            {% if req.senior_name %}
-              <br>
-              <strong>Senior:</strong> {{ req.senior_name }}<br>
-            {% endif %}
+            <strong>{{ request.title }}</strong><br>
+            {{ request.category }}<br>
+            <strong>Time:</strong> {{ request.time }}<br>
+            <strong>Description:</strong> {{ request.description }}<br>
+            <div id="map-req-{{ loop.index }}" class="map"></div>
             <br>
             <form action="/accept_request" method="post">
               <button type="submit" class="btn primary" name="id" value="{{ req.id }}">Accept</button>
@@ -86,7 +82,10 @@
             <div id="map-pending-{{ loop.index }}" class="map"></div>
             {% if req.senior_name %}
               <br>
-              <strong>Senior:</strong> {{ req.senior_name }}<br>
+              <strong>Senior:</strong> 
+              <button onclick="loadSeniorDetails({{ req.senior_id }}, this)">
+                {{ req.senior_name }}
+              </button>
             {% endif %}
             <br>
             <strong>Status:</strong> {{ req.status|title }}<br>
@@ -134,11 +133,34 @@
           const mapPending{{ loop.index }} = L.map('map-pending-{{ loop.index }}').setView([{{ req.lat }}, {{ req.lng }}], 15);
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
-          }).addTo(mapPending{{ loop.index }});
-          L.marker([{{ req.lat }}, {{ req.lng }}]).addTo(mapPending{{ loop.index }}).bindPopup("{{ req.title }}");
-        {% endif %}
-      {% endfor %}
-  </script>
-</div>
+            }).addTo(mapPending{{ loop.index }});
+            L.marker([{{ req.lat }}, {{ req.lng }}]).addTo(mapPending{{ loop.index }}).bindPopup("{{ req.title }}");
+          {% endif %}
+        {% endfor %}
+      });
+
+      // Senior details popup
+      async function loadSeniorDetails(seniorId, btn) {
+        const response = await fetch('/get_senior', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: seniorId })
+        });
+        const data = await response.json();
+        if (data.error) { alert(data.error); return; }
+
+        const details = btn.nextElementSibling;
+        details.innerHTML = `
+          <div class="stripe-card">
+            <h3>${data.name}</h3>
+            <p><strong>Age:</strong> ${data.age}</p>
+            <p><strong>Email:</strong> ${data.email}</p>
+            <p><strong>Phone:</strong> ${data.phone}</p>
+          </div>
+        `;
+      }
+    </script>
+  </div>
 </body>
 </html>
+
