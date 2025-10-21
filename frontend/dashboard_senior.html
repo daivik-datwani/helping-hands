@@ -4,7 +4,26 @@
   <meta charset="UTF-8">
   <title>Senior Dashboard | Helping Hands</title>
   <link rel="stylesheet" href="/style.css">
+
+  <!-- ✅ Leaflet CSS (Map styling) -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-Vm7vE7b0mCoYlICQSt0pIf43yV/PGdy1TtKrsS+3OoU="
+    crossorigin=""
+  />
+
+  <style>
+    /* Small inline styles for map box */
+    .map {
+      width: 100%;
+      height: 250px;
+      border-radius: 12px;
+      margin-top: 8px;
+    }
+  </style>
 </head>
+
 <body>
   <div class="container">
     <header class="site-header">
@@ -16,6 +35,7 @@
       </div>
     </header>
 
+    <!-- Profile Info -->
     <section class="stripe-card" style="margin-top:48px;">
       <h1 class="hero-title">Welcome back, {{ user.name }}! 👋</h1>
       <ul style="font-size:1.15em;line-height:1.6;color:var(--deep-red);margin:28px 0 0 0;padding:0;list-style:none;">
@@ -23,10 +43,14 @@
         <li><strong>Phone:</strong> {{ user.phone }}</li>
       </ul>
     </section>
+
     <br>
+
+    <!-- Requests Section -->
     <section class="stripe">
       <h2 class="hero-title" style="font-size:2em;">🆘 Requests</h2>
       <button type="button" class="btn primary" onclick="window.open('/request_help','_self')">Request Help</button>
+
       {% if requests and requests|length > 0 %}
         <div class="stripe-grid">
         {% for request in requests %}
@@ -34,24 +58,30 @@
             <strong>{{ request.title }}</strong><br>
             {{ request.category }}<br>
             <strong>Time:</strong> {{ request.time }}<br>
-            <strong>Placeholder before map implement:</strong> {{ request.lat }}, {{ request.lng }}<br>
             <strong>Description:</strong> {{ request.description }}<br>
+            <div id="map-req-{{ loop.index }}" class="map"></div>
             {% if request.caretaker_name %}
+              <br>
               <strong>Caretaker:</strong>
               <button onclick="loadCaretakerDetails({{ request.caretaker_id }}, this)">
                 {{ request.caretaker_name }}
               </button>
               <div class="caretaker-details"></div>
-              <br>
             {% endif %}
+            <br>
             <strong>Status:</strong> {{ request.status|title }}
-        </div>
+          </div>
         {% endfor %}
         </div>
       {% else %}
-        <p>No requests. Click the button to send one!</p>
+        <p>No requests yet. Click “Request Help” to create one!</p>
       {% endif %}
-      <br>
+    </section>
+
+    <br>
+
+    <!-- Accepted Requests Section -->
+    <section class="stripe">
       <h2 class="hero-title" style="font-size:2em;">📋 Your Accepted Requests</h2>
       {% if accepted and accepted|length > 0 %}
         <div class="stripe-grid">
@@ -60,53 +90,96 @@
             <strong>{{ accept.title }}</strong><br>
             {{ accept.category }}<br>
             <strong>Time:</strong> {{ accept.time }}<br>
-            <strong>Longitude and Latitude:</strong> {{ accept.lat }}, {{ accept.lng }}<br>
             <strong>Description:</strong> {{ accept.description }}<br>
+            <div id="map-acc-{{ loop.index }}" class="map"></div>
             {% if accept.caretaker_name %}
+              <br>
               <strong>Caretaker:</strong>
               <button onclick="loadCaretakerDetails({{ accept.caretaker_id }}, this)">
                 {{ accept.caretaker_name }}
               </button>
               <div class="caretaker-details"></div>
-              <br>
             {% endif %}
+            <br>
             <strong>Status:</strong> {{ accept.status|title }}
             {% if accept.status == "Pending" %}
-              <form action="/done" method="post"><button type="submit" class="btn primary" name="id" value="{{ accept.id }}">Done</button></form>
+              <form action="/done" method="post">
+                <button type="submit" class="btn primary" name="id" value="{{ accept.id }}">Done</button>
+              </form>
             {% endif %}
           </div>
         {% endfor %}
         </div>
       {% else %}
-        <p>You have no accepted requests yet. Accept a request to get started!</p>
+        <p>You have no accepted requests yet. Accept one to get started!</p>
       {% endif %}
     </section>
+
     <div style="text-align:right;">
       <a href="/logout" class="btn primary logout-button">Logout</a>
     </div>
-    <script>
-    async function loadCaretakerDetails(caretakerId, btn) {
-    const response = await fetch('/get_caretaker', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: caretakerId })
-    });
-    const data = await response.json();
-    if (data.error) {
-      alert(data.error);
-      return;
-    }
 
-    const details = btn.nextElementSibling; // targets the div right after the button
-    details.innerHTML = `
-      <div class="stripe-card">
-        <h3>${data.name}</h3>
-        <p><strong>Age:</strong> ${data.age}</p>
-        <p><strong>Email:</strong> ${data.email}</p>
-        <p><strong>Phone:</strong> ${data.phone}</p>
-      </div>
-    `;
-    }
+    <!-- ✅ Leaflet JS -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-o9N1jRVvJfTqvFztPq2tgJtN1lUep1z7vDgH8BJ1Jtk="
+      crossorigin=""
+    ></script>
+
+    <!-- ✅ Initialize Maps -->
+    <script>
+      window.addEventListener("load", () => {
+        if (typeof L === "undefined") {
+          console.error("❌ Leaflet failed to load. Check your CDN or internet.");
+          return;
+        }
+
+        // Render maps for requests
+        {% for request in requests %}
+          {% if request.lat and request.lng %}
+            const mapReq{{ loop.index }} = L.map('map-req-{{ loop.index }}').setView([{{ request.lat }}, {{ request.lng }}], 14);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(mapReq{{ loop.index }});
+            L.marker([{{ request.lat }}, {{ request.lng }}]).addTo(mapReq{{ loop.index }});
+          {% endif %}
+        {% endfor %}
+
+        // Render maps for accepted requests
+        {% for accept in accepted %}
+          {% if accept.lat and accept.lng %}
+            const mapAcc{{ loop.index }} = L.map('map-acc-{{ loop.index }}').setView([{{ accept.lat }}, {{ accept.lng }}], 14);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(mapAcc{{ loop.index }});
+            L.marker([{{ accept.lat }}, {{ accept.lng }}]).addTo(mapAcc{{ loop.index }});
+          {% endif %}
+        {% endfor %}
+      });
+
+      // Fetch caretaker details dynamically
+      async function loadCaretakerDetails(caretakerId, btn) {
+        const response = await fetch('/get_caretaker', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: caretakerId })
+        });
+        const data = await response.json();
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+
+        const details = btn.nextElementSibling;
+        details.innerHTML = `
+          <div class="stripe-card">
+            <h3>${data.name}</h3>
+            <p><strong>Age:</strong> ${data.age}</p>
+            <p><strong>Email:</strong> ${data.email}</p>
+            <p><strong>Phone:</strong> ${data.phone}</p>
+          </div>
+        `;
+      }
     </script>
   </div>
 </body>
