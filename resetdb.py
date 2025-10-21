@@ -4,8 +4,8 @@ from backend.db import engine, SessionLocal
 
 
 	
-# Base.metadata.drop_all(bind=engine, tables=[Feedback.__table__])
-# Base.metadata.create_all(bind=engine, tables=[Feedback.__table__])
+Base.metadata.drop_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 
 '''

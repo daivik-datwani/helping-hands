@@ -53,10 +53,10 @@
             {{ request.category }}<br>
             <strong>Time:</strong> {{ request.time }}<br>
             <strong>Description:</strong> {{ request.description }}<br>
-            <div id="map-req-{{ loop.index }}" class="map"></div>
+            <div id="map-open-{{ loop.index }}" class="map"></div>
             <br>
             <form action="/accept_request" method="post">
-              <button type="submit" class="btn primary" name="id" value="{{ req.id }}">Accept</button>
+              <button type="submit" class="btn primary" name="id" value="{{ request.id }}">Accept</button>
             </form>
           </div>
         {% endfor %}
