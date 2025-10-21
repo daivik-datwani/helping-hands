@@ -381,31 +381,6 @@ textarea#comment:focus {
     outline: none;
 }
 
-.btn.primary {
-    background: #299cdf;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    padding: 12px 34px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 6px rgba(43,72,162,0.09);
-    margin-top: 12px;
-}
 
-.btn.primary:hover, .btn.primary:focus {
-    background: #1878b7;
-}
-
-form {
-    max-width: 440px;
-    margin: 0 auto;
-    background: #fafbfe;
-    padding: 20px 28px 24px;
-    border-radius: 10px;
-    box-shadow: 0 4px 18px rgba(43,72,162,0.07);
-    font-family: "Segoe UI", "Inter", Arial, sans-serif;
-}
 =======
 >>>>>>> parent of dc81d57 (rating)
