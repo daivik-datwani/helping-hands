@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-
 :root{
   --warm-orange: #FF8A37;
   --deep-red: #D64545;
@@ -13,7 +12,6 @@
   --radius-sm: 10px;
   --max-width: 1100px;
 }
-
 /* Core typography and body */
 html { font-size: 16px; }
 body {
@@ -26,13 +24,11 @@ body {
   line-height: 1.6;
   font-size: 1em;
 }
-
 .container{
   width: 92%;
   max-width: var(--max-width);
   margin: 0 auto;
 }
-
 /* Top navigation */
 .site-header{
   position: sticky;
@@ -53,7 +49,6 @@ body {
 .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
 .logo-mark { font-size: 20px; }
 .logo-text { font-weight: 700; color: var(--deep-red); font-size: 1.4em; }
-
 /* Navigation links */
 .nav-list { display: flex; gap: 22px; list-style: none; padding: 0; margin: 0; }
 .nav-list a { color: var(--muted); text-decoration: none; font-weight: 600; padding: 8px 6px; border-radius: 8px; font-size: 1em; }
@@ -64,9 +59,7 @@ body {
 .btn.primary{background:linear-gradient(180deg,var(--warm-orange),var(--deep-red));color:var(--white);padding:10px 18px;border-radius:999px;box-shadow:var(--shadow-1);}
 .btn.primary:hover{background:linear-gradient(180deg,var(--deep-red),var(--warm-orange));}
 .logout-button { margin-top: 20px; }
-
 .nav-toggle{display:none;background:var(--deep-red);border:0;padding:8px;border-radius:10px;color:#fff;}
-
 /* Hero Bar/Section */
 .hero-title {
   color: var(--warm-orange);
@@ -76,14 +69,12 @@ body {
   letter-spacing: -0.01em;
   /* No text-shadow */
 }
-
 .hero-tagline { font-size: 1.2em; margin: 0 0 26px; color: var(--muted); max-width: 46rem; }
 .hero { background: linear-gradient(115deg, var(--white) 75%, var(--sun-yellow) 100%); border: 3px solid var(--warm-orange); box-shadow: 0 12px 48px rgba(214, 69, 69, 0.13); border-radius: 26px; padding: 60px 0 44px; margin: 24px 0;}
 .hero-ctas{display:flex;gap:14px;align-items:center;}
 .cta-large{background:linear-gradient(180deg,var(--warm-orange),var(--deep-red));color:var(--white);padding:18px 34px;border-radius:999px;font-size:18px;display:inline-block;box-shadow:var(--shadow-2);transition:transform .12s, box-shadow .12s;}
 .cta-large:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(214,69,69,0.12);}
 .btn.secondary{background:transparent;border:0;color:var(--muted);font-weight:600;}
-
 /* Stripe (sections: requests/caregivers/etc) */
 .stripe, .stripe-card {
   background: var(--white);
@@ -93,13 +84,11 @@ body {
   border: 1.5px solid #ecebf1;
   padding: 22px;
 }
-
 .stripe-grid {
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
 }
-
 .stripe-card {
   flex: 1 1 250px;
   max-width: 350px;
@@ -110,7 +99,6 @@ body {
   box-shadow: var(--shadow-1);
   border: 1px solid rgba(63,47,41,0.04);
 }
-
 ul {
   font-size: 1em;
   margin: 14px 0 0 0;
@@ -118,19 +106,16 @@ ul {
   list-style: none; padding: 0;
 }
 li strong { color: var(--deep-red);}
-
 /* Card content spacing and info */
 .stripe-card h3, .stripe h2, h2 { margin-top: 0; color: var(--deep-red); font-size: 1.3em; }
 h1, h2, h3 { line-height: 1.16; font-family: inherit; }
 h1{font-size:2em}
 h2{font-size:1.4em}
 h3{font-size:1.07em}
-
 /* Table/Requests/Helpers */
 .muted {color: var(--muted);}
 .small {font-size: 0.93em;color:var(--muted);}
 label, input, .btn, .logo-text, .nav-list a { font-size: 1em; }
-
 /* Auth forms */
 .auth-page{display:flex;justify-content:center;}
 .auth-card{width:100%;max-width:520px;background:var(--white);padding:32px;border-radius:14px;box-shadow:var(--shadow-1);border:1px solid rgba(19,33,25,0.03);}
@@ -146,12 +131,9 @@ label, input, .btn, .logo-text, .nav-list a { font-size: 1em; }
 }
 .form input:focus{box-shadow:0 6px 18px rgba(255,138,55,0.08);border-color:var(--warm-orange);}
 .form .btn.primary{width:100%;padding:12px 16px;font-size:1.07em;}
-
 .checkbox input{margin-right:8px;}
 .form .form-row{display:flex;justify-content:space-between;align-items:center;}
-
 .hidden{display:none;}
-
 /* Responsive */
 @media (max-width:980px){
   .container { width: 98%; }
@@ -159,7 +141,6 @@ label, input, .btn, .logo-text, .nav-list a { font-size: 1em; }
   .stripe-grid { flex-direction: column; gap: 12px; }
   .hero, .stripe, .stripe-card { padding: 14px; }
 }
-
 @media (max-width:480px){
   html { font-size: 15px; }
   .container { width: 99%; }
@@ -167,8 +148,60 @@ label, input, .btn, .logo-text, .nav-list a { font-size: 1em; }
   .btn, .btn.primary { font-size: 0.94em; padding: 10px 12px; }
   .stripe-card, .stripe { padding: 10px; }
 }
-
 /* Footer */
 .site-footer{padding:28px 0;background:transparent;}
 .footer-row{display:flex;justify-content:space-between;align-items:center;color:var(--muted);}
 .footer-nav a{margin-left:12px;color:var(--muted);text-decoration:none;}
+
+/* Modal Popup Styles for Senior Readability */
+.senior-details, .caretaker-details {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(3px);
+}
+
+.senior-details .stripe-card,
+.caretaker-details .stripe-card {
+  max-width: 600px;
+  min-width: 400px;
+  padding: 40px;
+  font-size: 1.3em;
+  line-height: 1.8;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.senior-details .stripe-card h3,
+.caretaker-details .stripe-card h3 {
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+.senior-details .stripe-card p,
+.caretaker-details .stripe-card p {
+  font-size: 1.2em;
+  margin: 15px 0;
+  line-height: 1.8;
+}
+
+.senior-details .stripe-card strong,
+.caretaker-details .stripe-card strong {
+  font-weight: 700;
+  color: var(--deep-red);
+}
+
+@media (max-width:768px){
+  .senior-details .stripe-card,
+  .caretaker-details .stripe-card {
+    min-width: 90%;
+    max-width: 90%;
+    padding: 30px;
+  }
+}
