@@ -172,3 +172,108 @@ label, input, .btn, .logo-text, .nav-list a { font-size: 1em; }
 .site-footer{padding:28px 0;background:transparent;}
 .footer-row{display:flex;justify-content:space-between;align-items:center;color:var(--muted);}
 .footer-nav a{margin-left:12px;color:var(--muted);text-decoration:none;}
+
+.txt-center {
+    text-align: center;
+    margin-top: 18px;
+}
+
+.hide {
+    display: none;
+}
+
+.clear {
+    float: none;
+    clear: both;
+}
+
+.rating {
+    width: 140px;
+    margin: 0 auto 20px auto;
+    unicode-bidi: bidi-override;
+    direction: rtl;
+    text-align: center;
+    position: relative;
+    font-size: 2rem;
+}
+
+.rating > label {
+    float: right;
+    display: inline-block;
+    padding: 0;
+    margin: 0 3px;
+    position: relative;
+    width: 1.2em;
+    cursor: pointer;
+    color: #bbb;
+    transition: color 0.2s;
+}
+
+.rating > label:hover,
+.rating > label:hover ~ label,
+.rating > input.radio-btn:checked ~ label {
+    color: transparent;
+}
+
+.rating > label:hover:before,
+.rating > label:hover ~ label:before,
+.rating > input.radio-btn:checked ~ label:before {
+    content: "\2605";
+    position: absolute;
+    left: 0;
+    color: #FFD700;
+    transition: color 0.2s;
+}
+
+label[for="comment"] {
+    display: block;
+    margin: 16px 0 6px 0;
+    font-weight: normal;
+    color: #444;
+    font-size: 1rem;
+}
+
+textarea#comment {
+    width: 98%;
+    max-width: 420px;
+    min-width: 140px;
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    resize: vertical;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+textarea#comment:focus {
+    border-color: #66aaff;
+    outline: none;
+}
+
+.btn.primary {
+    background: #299cdf;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 34px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 6px rgba(43,72,162,0.09);
+    margin-top: 12px;
+}
+
+.btn.primary:hover, .btn.primary:focus {
+    background: #1878b7;
+}
+
+form {
+    max-width: 440px;
+    margin: 0 auto;
+    background: #fafbfe;
+    padding: 20px 28px 24px;
+    border-radius: 10px;
+    box-shadow: 0 4px 18px rgba(43,72,162,0.07);
+    font-family: "Segoe UI", "Inter", Arial, sans-serif;
+}
