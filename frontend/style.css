@@ -74,7 +74,6 @@ body {
   font-weight: 800;
   margin: 0 0 14px;
   letter-spacing: -0.01em;
-  /* No text-shadow */
 }
 
 .hero-tagline { font-size: 1.2em; margin: 0 0 26px; color: var(--muted); max-width: 46rem; }
@@ -172,3 +171,133 @@ label, input, .btn, .logo-text, .nav-list a { font-size: 1em; }
 .site-footer{padding:28px 0;background:transparent;}
 .footer-row{display:flex;justify-content:space-between;align-items:center;color:var(--muted);}
 .footer-nav a{margin-left:12px;color:var(--muted);text-decoration:none;}
+
+/* ============================================================
+   REQUEST HELP PAGE (only this section updated)
+   ============================================================ */
+#request-help {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 80px 0;
+}
+
+#request-help .auth-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+  border: 1px solid rgba(214,69,69,0.08);
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 540px;
+  animation: fadeInUp 0.4s ease;
+}
+
+#request-help .auth-card h1 {
+  margin: 0 0 6px;
+  text-align: center;
+  color: var(--deep-red);
+  font-size: 1.8em;
+}
+
+#request-help .auth-card p.muted {
+  text-align: center;
+  color: var(--muted);
+  margin-bottom: 28px;
+  font-size: 1em;
+}
+
+#request-help-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#request-help-form label {
+  font-weight: 600;
+  color: #3a2f2a;
+  font-size: 1em;
+}
+
+#request-help-form input,
+#request-help-form textarea,
+#request-help-form select {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(43,55,46,0.12);
+  background: #fff;
+  font-size: 1em;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+#request-help-form input:focus,
+#request-help-form textarea:focus,
+#request-help-form select:focus {
+  border-color: var(--warm-orange);
+  box-shadow: 0 0 0 4px rgba(255,138,55,0.15);
+}
+
+/* Location section */
+#request-help .location-row {
+  background: rgba(255,138,55,0.06);
+  border: 1px solid rgba(214,69,69,0.08);
+  padding: 14px 16px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+#request-help .coords {
+  margin: 0;
+  font-size: 0.95em;
+  color: var(--muted);
+}
+
+/* Buttons */
+#request-help .btn.primary {
+  background: linear-gradient(135deg, var(--warm-orange), var(--deep-red));
+  color: var(--white);
+  box-shadow: var(--shadow-1);
+  width: 100%;
+  font-size: 1.05em;
+  margin-top: 6px;
+}
+#request-help .btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
+}
+
+#request-help .btn.ghost {
+  background: transparent;
+  border: 1px solid rgba(214,69,69,0.15);
+  color: var(--deep-red);
+  padding: 8px 14px;
+  font-size: 0.95em;
+  align-self: flex-start;
+}
+#request-help .btn.ghost:hover {
+  background: rgba(214,69,69,0.05);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+  #request-help {
+    padding: 48px 0;
+  }
+  #request-help .auth-card {
+    padding: 28px 22px;
+  }
+  #request-help-form input,
+  #request-help-form textarea,
+  #request-help-form select {
+    font-size: 0.95em;
+  }
+  #request-help .btn.primary {
+    font-size: 1em;
+  }
+}

@@ -1,55 +1,78 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Request Help — Senior</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Request Help | Helping Hands</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+
+  <!-- Header -->
   <header class="site-header">
     <div class="container nav-row">
-      <a href="{{ url_for('dashboard') }}" class="logo">
-        <span class="logo-mark">🤝</span><span class="logo-text">Helping Hands</span>
+      <a class="logo" href="/">
+        <span class="logo-mark">🤝</span>
+        <span class="logo-text">Helping Hands</span>
       </a>
+
+      <nav class="nav">
+        <ul class="nav-list">
+          <li><a href="/">Home</a></li>
+          <li><a href="/requests">Requests</a></li>
+          <li><a href="/caretakers">Caretakers</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+      </nav>
+
+      <div class="auth-actions">
+        <a href="/login" class="btn ghost">Log In</a>
+        <a href="/signup" class="btn primary">Sign Up</a>
+      </div>
     </div>
   </header>
 
-  <main class="container">
-    <section class="request-help-page" style="padding:72px 0">
+  <!-- Request Help Section -->
+  <section id="request-help">
+    <div class="container">
       <div class="auth-card">
         <h1>Request Help</h1>
-        <p class="muted">Fill in the details below so a caretaker can assist you.</p>
+        <p class="muted">Tell us what kind of help you need, and a caretaker will reach out soon.</p>
 
-        <form action="{{ url_for('request_help') }}" method="post" class="form">
-          <label for="title">Title</label>
-          <input id="title" name="title" type="text" required autocomplete="off">
+        <form id="request-help-form" method="POST" action="/request_help">
+          
+          <!-- Name -->
+          <label for="full_name">Full Name</label>
+          <input type="text" id="full_name" name="full_name" placeholder="Your full name" required>
 
-          <label for="description">Description</label>
-          <textarea id="description" name="description" rows="4" required></textarea>
+          <!-- Contact Info -->
+          <label for="phone_number">Phone Number</label>
+          <input type="tel" id="phone_number" name="phone_number" placeholder="Enter your phone number" required>
 
-          <label for="category">Category</label>
-          <select id="category" name="category" required>
-            <option value="">-- Select --</option>
-            <option value="Grocery">Grocery</option>
-            <option value="Medical">Medical</option>
-            <option value="Household">Household</option>
-            <option value="Transport">Transport</option>
-            <option value="Other">Other</option>
+          <!-- Category -->
+          <label for="help_type">Type of Help</label>
+          <select id="help_type" name="help_type" required>
+            <option value="" disabled selected>Select one...</option>
+            <option value="groceries">Groceries / Shopping</option>
+            <option value="cleaning">Cleaning Assistance</option>
+            <option value="medical">Medical Support</option>
+            <option value="transport">Transportation</option>
+            <option value="other">Other</option>
           </select>
 
-          <label for="time">Date &amp; Time Needed</label>
-          <input id="time" name="time" type="datetime-local" required min="2000-01-01T00:00" max="3000-12-31T23:59">
+          <!-- Description -->
+          <label for="description">Describe Your Request/Location</label>
+          <textarea id="description" name="description" rows="4" placeholder="Please describe what help you need..." required></textarea>
 
-          <label for="location">Location</label>
-          Send to Lat:{{ user.lat }} Long:{{ user.lng }}
-          <button type="button" class="btn muted" onclick="window.open('set_location.html', '_self')">Change Location</button>
-          <button class="btn primary" type="submit">Submit Request</button>
-        </form>
-
-        <p class="small"><a href="{{ url_for('dashboard') }}">Back to Dashboard</a></p>
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-row">
+      <p>&copy; 2025 Helping Hands</p>
+      <div class="footer-nav">
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
       </div>
-    </section>
-  </main>
+    </div>
+  </footer>
 </body>
 </html>
