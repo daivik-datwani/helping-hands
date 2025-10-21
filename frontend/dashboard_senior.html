@@ -5,25 +5,22 @@
   <title>Senior Dashboard | Helping Hands</title>
   <link rel="stylesheet" href="/style.css">
 
-  <!-- ✅ Leaflet CSS (Map styling) -->
+  <!-- Leaflet CSS -->
   <link
     rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-Vm7vE7b0mCoYlICQSt0pIf43yV/PGdy1TtKrsS+3OoU="
-    crossorigin=""
   />
 
   <style>
-    /* Small inline styles for map box */
     .map {
       width: 100%;
       height: 250px;
       border-radius: 12px;
       margin-top: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
   </style>
 </head>
-
 <body>
   <div class="container">
     <header class="site-header">
@@ -46,9 +43,9 @@
 
     <br>
 
-    <!-- Requests Section -->
+    <!-- Your Requests -->
     <section class="stripe">
-      <h2 class="hero-title" style="font-size:2em;">🆘 Requests</h2>
+      <h2 class="hero-title" style="font-size:2em;">🆘 Your Requests</h2>
       <button type="button" class="btn primary" onclick="window.open('/request_help','_self')">Request Help</button>
 
       {% if requests and requests|length > 0 %}
@@ -60,6 +57,7 @@
             <strong>Time:</strong> {{ request.time }}<br>
             <strong>Description:</strong> {{ request.description }}<br>
             <div id="map-req-{{ loop.index }}" class="map"></div>
+
             {% if request.caretaker_name %}
               <br>
               <strong>Caretaker:</strong>
@@ -80,38 +78,34 @@
 
     <br>
 
-    <!-- Accepted Requests Section -->
+    <!-- Completed Requests -->
     <section class="stripe">
-      <h2 class="hero-title" style="font-size:2em;">📋 Your Accepted Requests</h2>
-      {% if accepted and accepted|length > 0 %}
+      <h2 class="hero-title" style="font-size:2em;">📋 Your Completed Requests</h2>
+      {% if completed and completed|length > 0 %}
         <div class="stripe-grid">
-        {% for accept in accepted %}
+        {% for complete in completed %}
           <div class="stripe-card">
-            <strong>{{ accept.title }}</strong><br>
-            {{ accept.category }}<br>
-            <strong>Time:</strong> {{ accept.time }}<br>
-            <strong>Description:</strong> {{ accept.description }}<br>
-            <div id="map-acc-{{ loop.index }}" class="map"></div>
-            {% if accept.caretaker_name %}
+            <strong>{{ complete.title }}</strong><br>
+            {{ complete.category }}<br>
+            <strong>Time:</strong> {{ complete.time }}<br>
+            <strong>Description:</strong> {{ complete.description }}<br>
+            <div id="map-comp-{{ loop.index }}" class="map"></div>
+
+            {% if complete.caretaker_name %}
               <br>
               <strong>Caretaker:</strong>
-              <button onclick="loadCaretakerDetails({{ accept.caretaker_id }}, this)">
-                {{ accept.caretaker_name }}
+              <button onclick="loadCaretakerDetails({{ complete.caretaker_id }}, this)">
+                {{ complete.caretaker_name }}
               </button>
               <div class="caretaker-details"></div>
             {% endif %}
             <br>
-            <strong>Status:</strong> {{ accept.status|title }}
-            {% if accept.status == "Pending" %}
-              <form action="/done" method="post">
-                <button type="submit" class="btn primary" name="id" value="{{ accept.id }}">Done</button>
-              </form>
-            {% endif %}
+            <strong>Status:</strong> {{ complete.status|title }}
           </div>
         {% endfor %}
         </div>
       {% else %}
-        <p>You have no accepted requests yet. Accept one to get started!</p>
+        <p>You have no completed requests yet.</p>
       {% endif %}
     </section>
 
@@ -119,45 +113,46 @@
       <a href="/logout" class="btn primary logout-button">Logout</a>
     </div>
 
-    <!-- ✅ Leaflet JS -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"
-      integrity="sha256-o9N1jRVvJfTqvFztPq2tgJtN1lUep1z7vDgH8BJ1Jtk="
-      crossorigin=""
-    ></script>
+    <!-- Leaflet JS -->
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <!-- ✅ Initialize Maps -->
     <script>
-      window.addEventListener("load", () => {
+      document.addEventListener("DOMContentLoaded", () => {
         if (typeof L === "undefined") {
-          console.error("❌ Leaflet failed to load. Check your CDN or internet.");
+          console.error("Leaflet did not load");
           return;
         }
 
-        // Render maps for requests
+        // Requests maps
         {% for request in requests %}
           {% if request.lat and request.lng %}
-            const mapReq{{ loop.index }} = L.map('map-req-{{ loop.index }}').setView([{{ request.lat }}, {{ request.lng }}], 14);
+            const mapReq{{ loop.index }} = L.map('map-req-{{ loop.index }}').setView([{{ request.lat }}, {{ request.lng }}], 15);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
               attribution: '&copy; OpenStreetMap contributors'
             }).addTo(mapReq{{ loop.index }});
-            L.marker([{{ request.lat }}, {{ request.lng }}]).addTo(mapReq{{ loop.index }});
+            L.marker([{{ request.lat }}, {{ request.lng }}])
+              .addTo(mapReq{{ loop.index }})
+              .bindPopup("{{ request.title }}")
+              .openPopup();
           {% endif %}
         {% endfor %}
 
-        // Render maps for accepted requests
-        {% for accept in accepted %}
-          {% if accept.lat and accept.lng %}
-            const mapAcc{{ loop.index }} = L.map('map-acc-{{ loop.index }}').setView([{{ accept.lat }}, {{ accept.lng }}], 14);
+        // Completed maps
+        {% for complete in completed %}
+          {% if complete.lat and complete.lng %}
+            const mapComp{{ loop.index }} = L.map('map-comp-{{ loop.index }}').setView([{{ complete.lat }}, {{ complete.lng }}], 15);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
               attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(mapAcc{{ loop.index }});
-            L.marker([{{ accept.lat }}, {{ accept.lng }}]).addTo(mapAcc{{ loop.index }});
+            }).addTo(mapComp{{ loop.index }});
+            L.marker([{{ complete.lat }}, {{ complete.lng }}])
+              .addTo(mapComp{{ loop.index }})
+              .bindPopup("{{ complete.title }}")
+              .openPopup();
           {% endif %}
         {% endfor %}
       });
 
-      // Fetch caretaker details dynamically
+      // Caretaker details popup
       async function loadCaretakerDetails(caretakerId, btn) {
         const response = await fetch('/get_caretaker', {
           method: 'POST',
@@ -165,10 +160,7 @@
           body: JSON.stringify({ id: caretakerId })
         });
         const data = await response.json();
-        if (data.error) {
-          alert(data.error);
-          return;
-        }
+        if (data.error) { alert(data.error); return; }
 
         const details = btn.nextElementSibling;
         details.innerHTML = `

@@ -11,24 +11,19 @@
   <!-- Header -->
   <header class="site-header">
     <div class="container nav-row">
-      <a class="logo" href="/">
+      <a class="logo" href="/dashboard">
         <span class="logo-mark">🤝</span>
         <span class="logo-text">Helping Hands</span>
       </a>
 
       <nav class="nav">
         <ul class="nav-list">
-          <li><a href="/">Home</a></li>
-          <li><a href="/requests">Requests</a></li>
-          <li><a href="/caretakers">Caretakers</a></li>
-          <li><a href="/about">About</a></li>
+          <li><a href="/dashboard">Dashboard</a></li>
+          <li><a href="/request_help">Request Help</a></li>
+          <li><a href="/set_location">Set Location</a></li>
+          <li><a href="/logout">Logout</a></li>
         </ul>
       </nav>
-
-      <div class="auth-actions">
-        <a href="/login" class="btn ghost">Log In</a>
-        <a href="/signup" class="btn primary">Sign Up</a>
-      </div>
     </div>
   </header>
 
@@ -37,21 +32,17 @@
     <div class="container">
       <div class="auth-card">
         <h1>Request Help</h1>
-        <p class="muted">Tell us what kind of help you need, and a caretaker will reach out soon.</p>
+        <p class="muted">Fill out the details below to request help near your location.</p>
 
         <form id="request-help-form" method="POST" action="/request_help">
           
-          <!-- Name -->
-          <label for="full_name">Full Name</label>
-          <input type="text" id="full_name" name="full_name" placeholder="Your full name" required>
-
-          <!-- Contact Info -->
-          <label for="phone_number">Phone Number</label>
-          <input type="tel" id="phone_number" name="phone_number" placeholder="Enter your phone number" required>
+          <!-- Title -->
+          <label for="title">Request Title</label>
+          <input type="text" id="title" name="title" placeholder="e.g. Need groceries" required>
 
           <!-- Category -->
-          <label for="help_type">Type of Help</label>
-          <select id="help_type" name="help_type" required>
+          <label for="category">Type of Help</label>
+          <select id="category" name="category" required>
             <option value="" disabled selected>Select one...</option>
             <option value="groceries">Groceries / Shopping</option>
             <option value="cleaning">Cleaning Assistance</option>
@@ -61,8 +52,20 @@
           </select>
 
           <!-- Description -->
-          <label for="description">Describe Your Request/Location</label>
-          <textarea id="description" name="description" rows="4" placeholder="Please describe what help you need..." required></textarea>
+          <label for="description">Description</label>
+          <textarea id="description" name="description" rows="4" placeholder="Describe what you need help with..." required></textarea>
+
+          <!-- Time -->
+          <label for="time">Preferred Time</label>
+          <input type="datetime-local" id="time" name="time" required>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn primary">Submit Request</button>
+
+        </form>
+      </div>
+    </div>
+  </section>
 
   <!-- Footer -->
   <footer class="site-footer">
@@ -74,5 +77,6 @@
       </div>
     </div>
   </footer>
+
 </body>
 </html>

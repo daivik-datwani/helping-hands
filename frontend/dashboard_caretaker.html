@@ -4,6 +4,22 @@
   <meta charset="UTF-8">
   <title>Caretaker Dashboard | Helping Hands</title>
   <link rel="stylesheet" href="/style.css">
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <style>
+    .map {
+      width: 100%;
+      height: 250px;
+      border-radius: 12px;
+      margin-top: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -16,6 +32,7 @@
       </div>
     </header>
 
+    <!-- Profile Info -->
     <section class="stripe-card" style="margin-top:48px;">
       <h1 class="hero-title">Welcome back, {{ user.name }}! 👋</h1>
       <ul style="font-size:1.15em;line-height:1.6;color:var(--deep-red);margin:28px 0 0 0;padding:0;list-style:none;">
@@ -23,9 +40,12 @@
         <li><strong>Phone:</strong> {{ user.phone }}</li>
       </ul>
     </section>
+
     <br>
+
+    <!-- Pending Requests -->
     <section class="stripe">
-      <h2 class="hero-title" style="font-size:2em;">🆘 Requests</h2>
+      <h2 class="hero-title" style="font-size:2em;">🆘 Pending Requests</h2>
       {% if requests and requests|length > 0 %}
         <div class="stripe-grid">
         {% for request in requests %}
@@ -33,80 +53,125 @@
             <strong>{{ request.title }}</strong><br>
             {{ request.category }}<br>
             <strong>Time:</strong> {{ request.time }}<br>
-            <strong>Placeholder before map implement:</strong> {{ request.lat }}, {{ request.lng }}<br>
             <strong>Description:</strong> {{ request.description }}<br>
+            <div id="map-req-{{ loop.index }}" class="map"></div>
+
             {% if request.senior_name %}
+              <br>
               <strong>Senior:</strong>
               <button onclick="loadSeniorDetails({{ request.senior_id }}, this)">
                 {{ request.senior_name }}
               </button>
               <div class="senior-details"></div>
-              <br>
             {% endif %}
+            <br>
             <strong>Status:</strong> {{ request.status|title }}
-            <form action="/accept_request" method="post"><button type="submit" class="btn primary" name="id" value="{{ request.id }}">Accept</button></form>
+            <form action="/accept_request" method="post">
+              <button type="submit" class="btn primary" name="id" value="{{ request.id }}">Accept</button>
+            </form>
           </div>
         {% endfor %}
         </div>
       {% else %}
         <p>No requests. Come back later!</p>
       {% endif %}
+
       <br>
-      <h2 class="hero-title" style="font-size:2em;">📋 Your Accepted Requests</h2>
-      {% if accepted and accepted|length > 0 %}
+
+      <!-- Completed Requests -->
+      <h2 class="hero-title" style="font-size:2em;">✅ Your Completed Requests</h2>
+      {% set completed_requests = accepted | selectattr('status', 'equalto', 'Completed') | list %}
+      {% if completed_requests and completed_requests|length > 0 %}
         <div class="stripe-grid">
-        {% for accept in accepted %}
+        {% for comp in completed_requests %}
           <div class="stripe-card">
-            <strong>{{ accept.title }}</strong><br>
-            {{ accept.category }}<br>
-            <strong>Time:</strong> {{ accept.time }}<br>
-            <strong>Placeholder before map implement:</strong> {{ accept.lat }}, {{ accept.lng }}<br>
-            <strong>Description:</strong> {{ accept.description }}<br>
-            {% if accept.senior_name %}
+            <strong>{{ comp.title }}</strong><br>
+            {{ comp.category }}<br>
+            <strong>Time:</strong> {{ comp.time }}<br>
+            <strong>Description:</strong> {{ comp.description }}<br>
+            <div id="map-comp-{{ loop.index }}" class="map"></div>
+
+            {% if comp.senior_name %}
+              <br>
               <strong>Senior:</strong>
-              <button onclick="loadSeniorDetails({{ accept.senior_id }}, this)">
-                {{ accept.senior_name }}
+              <button onclick="loadSeniorDetails({{ comp.senior_id }}, this)">
+                {{ comp.senior_name }}
               </button>
               <div class="senior-details"></div>
-              <br>
             {% endif %}
-            <strong>Status:</strong> {{ accept.status|title }}
-            {% if accept.status == "Pending" %}
-              <form action="/done" method="post"><button type="submit" class="btn primary" name="id" value="{{ accept.id }}">Done</button></form>
-            {% endif %}
+            <br>
+            <strong>Status:</strong> {{ comp.status|title }}
           </div>
         {% endfor %}
         </div>
       {% else %}
-        <p>You have no accepted requests yet. Accept a request to get started!</p>
+        <p>You have no completed requests yet.</p>
       {% endif %}
     </section>
+
     <div style="text-align:right;">
       <a href="/logout" class="btn primary logout-button">Logout</a>
     </div>
-    <script>
-    async function loadSeniorDetails(seniorId, btn) {
-    const response = await fetch('/get_senior', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: seniorId })
-    });
-    const data = await response.json();
-    if (data.error) {
-      alert(data.error);
-      return;
-    }
 
-    const details = btn.nextElementSibling; // targets the div right after the button
-    details.innerHTML = `
-      <div class="stripe-card">
-        <h3>${data.name}</h3>
-        <p><strong>Age:</strong> ${data.age}</p>
-        <p><strong>Email:</strong> ${data.email}</p>
-        <p><strong>Phone:</strong> ${data.phone}</p>
-      </div>
-    `;
-    }
+    <!-- Leaflet JS -->
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        if (typeof L === "undefined") {
+          console.error("Leaflet did not load");
+          return;
+        }
+
+        // Maps for pending requests
+        {% for request in requests %}
+          {% if request.lat and request.lng %}
+            const mapReq{{ loop.index }} = L.map('map-req-{{ loop.index }}').setView([{{ request.lat }}, {{ request.lng }}], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(mapReq{{ loop.index }});
+            L.marker([{{ request.lat }}, {{ request.lng }}])
+              .addTo(mapReq{{ loop.index }})
+              .bindPopup("{{ request.title }}")
+              .openPopup();
+          {% endif %}
+        {% endfor %}
+
+        // Maps for completed requests
+        {% for comp in completed_requests %}
+          {% if comp.lat and comp.lng %}
+            const mapComp{{ loop.index }} = L.map('map-comp-{{ loop.index }}').setView([{{ comp.lat }}, {{ comp.lng }}], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(mapComp{{ loop.index }});
+            L.marker([{{ comp.lat }}, {{ comp.lng }}])
+              .addTo(mapComp{{ loop.index }})
+              .bindPopup("{{ comp.title }}")
+              .openPopup();
+          {% endif %}
+        {% endfor %}
+      });
+
+      // Senior details popup
+      async function loadSeniorDetails(seniorId, btn) {
+        const response = await fetch('/get_senior', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: seniorId })
+        });
+        const data = await response.json();
+        if (data.error) { alert(data.error); return; }
+
+        const details = btn.nextElementSibling;
+        details.innerHTML = `
+          <div class="stripe-card">
+            <h3>${data.name}</h3>
+            <p><strong>Age:</strong> ${data.age}</p>
+            <p><strong>Email:</strong> ${data.email}</p>
+            <p><strong>Phone:</strong> ${data.phone}</p>
+          </div>
+        `;
+      }
     </script>
   </div>
 </body>
