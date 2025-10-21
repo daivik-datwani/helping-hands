@@ -22,157 +22,161 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <header class="site-header">
-      <div class="nav-row">
-        <a class="logo" href="/">
-          <span class="logo-mark">🤝</span>
-          <span class="logo-text">Helping Hands</span>
-        </a>
-      </div>
-    </header>
+<div class="container">
+  <header class="site-header">
+    <div class="nav-row">
+      <a class="logo" href="/">
+        <span class="logo-mark">🤝</span>
+        <span class="logo-text">Helping Hands</span>
+      </a>
+    </div>
+  </header>
 
-    <!-- Profile Info -->
-    <section class="stripe-card" style="margin-top:48px;">
-      <h1 class="hero-title">Welcome back, {{ user.name }}! 👋</h1>
-      <ul style="font-size:1.15em;line-height:1.6;color:var(--deep-red);margin:28px 0 0 0;padding:0;list-style:none;">
-        <li><strong>Email:</strong> {{ user.email }}</li>
-        <li><strong>Phone:</strong> {{ user.phone }}</li>
-      </ul>
-    </section>
+  <section class="stripe-card" style="margin-top:48px;">
+    <h1 class="hero-title">Welcome back, {{ user.name }}! 👋</h1>
+    <ul style="font-size:1.15em;line-height:1.6;color:var(--deep-red);margin:28px 0 0 0;padding:0;list-style:none;">
+      <li><strong>Email:</strong> {{ user.email }}</li>
+      <li><strong>Phone:</strong> {{ user.phone }}</li>
+    </ul>
+  </section>
 
-    <br>
+  <br>
 
-    <!-- Pending Requests -->
-    <section class="stripe">
-      <h2 class="hero-title" style="font-size:2em;">🆘 Pending Requests</h2>
-      {% if requests and requests|length > 0 %}
-        <div class="stripe-grid">
-        {% for request in requests %}
+  <!-- CURRENT OPEN REQUESTS -->
+  <section class="stripe">
+    <h2 class="hero-title" style="font-size:2em;">🆕 Current Open Requests</h2>
+    {% if open_requests and open_requests|length > 0 %}
+      <div class="stripe-grid">
+        {% for req in open_requests %}
           <div class="stripe-card">
-            <strong>{{ request.title }}</strong><br>
-            {{ request.category }}<br>
-            <strong>Time:</strong> {{ request.time }}<br>
-            <strong>Description:</strong> {{ request.description }}<br>
-            <div id="map-req-{{ loop.index }}" class="map"></div>
-
-            {% if request.senior_name %}
+            <strong>{{ req.title }}</strong><br>
+            {{ req.category }}<br>
+            <strong>Time:</strong> {{ req.time }}<br>
+            <strong>Description:</strong> {{ req.description }}<br>
+            <div id="map-open-{{ loop.index }}" class="map"></div>
+            {% if req.senior_name %}
               <br>
-              <strong>Senior:</strong>
-              <button onclick="loadSeniorDetails({{ request.senior_id }}, this)">
-                {{ request.senior_name }}
-              </button>
-              <div class="senior-details"></div>
+              <strong>Senior:</strong> {{ req.senior_name }}<br>
             {% endif %}
             <br>
-            <strong>Status:</strong> {{ request.status|title }}
             <form action="/accept_request" method="post">
-              <button type="submit" class="btn primary" name="id" value="{{ request.id }}">Accept</button>
+              <button type="submit" class="btn primary" name="id" value="{{ req.id }}">Accept</button>
             </form>
           </div>
         {% endfor %}
-        </div>
-      {% else %}
-        <p>No requests. Come back later!</p>
-      {% endif %}
+      </div>
+    {% else %}
+      <p>No current open requests.</p>
+    {% endif %}
+  </section>
 
-      <br>
+  <br>
 
-      <!-- Completed Requests -->
-      <h2 class="hero-title" style="font-size:2em;">✅ Your Completed Requests</h2>
-      {% set completed_requests = accepted | selectattr('status', 'equalto', 'Completed') | list %}
-      {% if completed_requests and completed_requests|length > 0 %}
-        <div class="stripe-grid">
-        {% for comp in completed_requests %}
+  <!-- PENDING REQUESTS -->
+  <section class="stripe">
+    <h2 class="hero-title" style="font-size:2em;">⏳ Pending Requests</h2>
+    {% if pending and pending|length > 0 %}
+      <div class="stripe-grid">
+        {% for req in pending %}
           <div class="stripe-card">
-            <strong>{{ comp.title }}</strong><br>
-            {{ comp.category }}<br>
-            <strong>Time:</strong> {{ comp.time }}<br>
-            <strong>Description:</strong> {{ comp.description }}<br>
-            <div id="map-comp-{{ loop.index }}" class="map"></div>
-
-            {% if comp.senior_name %}
+            <strong>{{ req.title }}</strong><br>
+            {{ req.category }}<br>
+            <strong>Time:</strong> {{ req.time }}<br>
+            <strong>Description:</strong> {{ req.description }}<br>
+            <div id="map-pending-{{ loop.index }}" class="map"></div>
+            {% if req.senior_name %}
               <br>
-              <strong>Senior:</strong>
-              <button onclick="loadSeniorDetails({{ comp.senior_id }}, this)">
-                {{ comp.senior_name }}
-              </button>
-              <div class="senior-details"></div>
+              <strong>Senior:</strong> {{ req.senior_name }}<br>
             {% endif %}
             <br>
-            <strong>Status:</strong> {{ comp.status|title }}
+            <strong>Status:</strong> {{ req.status|title }}<br>
+            <form action="/done" method="post">
+              <button type="submit" class="btn primary" name="id" value="{{ req.id }}">Done</button>
+            </form>
           </div>
         {% endfor %}
-        </div>
-      {% else %}
-        <p>You have no completed requests yet.</p>
-      {% endif %}
-    </section>
+      </div>
+    {% else %}
+      <p>No pending requests.</p>
+    {% endif %}
+  </section>
 
-    <div style="text-align:right;">
-      <a href="/logout" class="btn primary logout-button">Logout</a>
-    </div>
+  <br>
 
-    <!-- Leaflet JS -->
-    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        if (typeof L === "undefined") {
-          console.error("Leaflet did not load");
-          return;
-        }
-
-        // Maps for pending requests
-        {% for request in requests %}
-          {% if request.lat and request.lng %}
-            const mapReq{{ loop.index }} = L.map('map-req-{{ loop.index }}').setView([{{ request.lat }}, {{ request.lng }}], 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-              attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(mapReq{{ loop.index }});
-            L.marker([{{ request.lat }}, {{ request.lng }}])
-              .addTo(mapReq{{ loop.index }})
-              .bindPopup("{{ request.title }}")
-              .openPopup();
-          {% endif %}
-        {% endfor %}
-
-        // Maps for completed requests
-        {% for comp in completed_requests %}
-          {% if comp.lat and comp.lng %}
-            const mapComp{{ loop.index }} = L.map('map-comp-{{ loop.index }}').setView([{{ comp.lat }}, {{ comp.lng }}], 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-              attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(mapComp{{ loop.index }});
-            L.marker([{{ comp.lat }}, {{ comp.lng }}])
-              .addTo(mapComp{{ loop.index }})
-              .bindPopup("{{ comp.title }}")
-              .openPopup();
-          {% endif %}
-        {% endfor %}
-      });
-
-      // Senior details popup
-      async function loadSeniorDetails(seniorId, btn) {
-        const response = await fetch('/get_senior', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: seniorId })
-        });
-        const data = await response.json();
-        if (data.error) { alert(data.error); return; }
-
-        const details = btn.nextElementSibling;
-        details.innerHTML = `
+  <!-- COMPLETED REQUESTS -->
+  <section class="stripe">
+    <h2 class="hero-title" style="font-size:2em;">✅ Completed Requests</h2>
+    {% if completed and completed|length > 0 %}
+      <div class="stripe-grid">
+        {% for req in completed %}
           <div class="stripe-card">
-            <h3>${data.name}</h3>
-            <p><strong>Age:</strong> ${data.age}</p>
-            <p><strong>Email:</strong> ${data.email}</p>
-            <p><strong>Phone:</strong> ${data.phone}</p>
+            <strong>{{ req.title }}</strong><br>
+            {{ req.category }}<br>
+            <strong>Time:</strong> {{ req.time }}<br>
+            <strong>Description:</strong> {{ req.description }}<br>
+            <div id="map-completed-{{ loop.index }}" class="map"></div>
+            {% if req.senior_name %}
+              <br>
+              <strong>Senior:</strong> {{ req.senior_name }}<br>
+            {% endif %}
+            <br>
+            <strong>Status:</strong> {{ req.status|title }}
           </div>
-        `;
-      }
-    </script>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>No completed requests yet.</p>
+    {% endif %}
+  </section>
+
+  <div style="text-align:right;">
+    <a href="/logout" class="btn primary logout-button">Logout</a>
   </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (typeof L === "undefined") {
+        console.error("Leaflet did not load");
+        return;
+      }
+
+      // Maps for open requests
+      {% for req in open_requests %}
+        {% if req.lat and req.lng %}
+          const mapOpen{{ loop.index }} = L.map('map-open-{{ loop.index }}').setView([{{ req.lat }}, {{ req.lng }}], 15);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+          }).addTo(mapOpen{{ loop.index }});
+          L.marker([{{ req.lat }}, {{ req.lng }}]).addTo(mapOpen{{ loop.index }}).bindPopup("{{ req.title }}");
+        {% endif %}
+      {% endfor %}
+
+      // Maps for pending requests
+      {% for req in pending %}
+        {% if req.lat and req.lng %}
+          const mapPending{{ loop.index }} = L.map('map-pending-{{ loop.index }}').setView([{{ req.lat }}, {{ req.lng }}], 15);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+          }).addTo(mapPending{{ loop.index }});
+          L.marker([{{ req.lat }}, {{ req.lng }}]).addTo(mapPending{{ loop.index }}).bindPopup("{{ req.title }}");
+        {% endif %}
+      {% endfor %}
+
+      // Maps for completed requests
+      {% for req in completed %}
+        {% if req.lat and req.lng %}
+          const mapCompleted{{ loop.index }} = L.map('map-completed-{{ loop.index }}').setView([{{ req.lat }}, {{ req.lng }}], 15);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+          }).addTo(mapCompleted{{ loop.index }});
+          L.marker([{{ req.lat }}, {{ req.lng }}]).addTo(mapCompleted{{ loop.index }}).bindPopup("{{ req.title }}");
+        {% endif %}
+      {% endfor %}
+    });
+  </script>
+</div>
 </body>
 </html>

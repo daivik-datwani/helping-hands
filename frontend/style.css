@@ -68,12 +68,27 @@ body {
 .nav-toggle{display:none;background:var(--deep-red);border:0;padding:8px;border-radius:10px;color:#fff;}
 
 /* Hero Bar/Section */
-.hero-title {
-  color: var(--warm-orange);
-  font-size: 2.1em;
-  font-weight: 800;
-  margin: 0 0 14px;
-  letter-spacing: -0.01em;
+.hero-grid {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.hero-content {
+    flex: 1;
+}
+
+.hero-visual {
+    flex: 1;
+}
+
+.hero-visual img {
+    width: 100%;
+    height: auto;
+    max-width: 400px;
+    border-radius: 30px;
+    box-shadow: #aaaaaa 0 8px 30px;
+    object-fit: cover;
 }
 
 .hero-tagline { font-size: 1.2em; margin: 0 0 26px; color: var(--muted); max-width: 46rem; }
@@ -171,7 +186,6 @@ label, input, .btn, .logo-text, .nav-list a { font-size: 1em; }
 .site-footer{padding:28px 0;background:transparent;}
 .footer-row{display:flex;justify-content:space-between;align-items:center;color:var(--muted);}
 .footer-nav a{margin-left:12px;color:var(--muted);text-decoration:none;}
-<<<<<<< HEAD
 
 /* ============================================================
    REQUEST HELP PAGE (only this section updated)
@@ -382,5 +396,3 @@ textarea#comment:focus {
 }
 
 
-=======
->>>>>>> parent of dc81d57 (rating)
