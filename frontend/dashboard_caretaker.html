@@ -133,10 +133,11 @@
           const mapPending{{ loop.index }} = L.map('map-pending-{{ loop.index }}').setView([{{ req.lat }}, {{ req.lng }}], 15);
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
-          }).addTo(mapPending{{ loop.index }});
-          L.marker([{{ req.lat }}, {{ req.lng }}]).addTo(mapPending{{ loop.index }}).bindPopup("{{ req.title }}");
-        {% endif %}
-      {% endfor %}
+            }).addTo(mapPending{{ loop.index }});
+            L.marker([{{ req.lat }}, {{ req.lng }}]).addTo(mapPending{{ loop.index }}).bindPopup("{{ req.title }}");
+          {% endif %}
+        {% endfor %}
+      });
 
       // Senior details popup
       async function loadSeniorDetails(seniorId, btn) {
