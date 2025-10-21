@@ -45,9 +45,8 @@
 
     <!-- Your Requests -->
     <section class="stripe">
-      <h2 class="hero-title" style="font-size:2em;">🆘 Your Requests</h2>
+      <h2 class="hero-title" style="font-size:2em;"> Requests</h2>
       <button type="button" class="btn primary" onclick="window.open('/request_help','_self')">Request Help</button>
-
       {% if requests and requests|length > 0 %}
         <div class="stripe-grid">
         {% for request in requests %}
@@ -56,56 +55,53 @@
             {{ request.category }}<br>
             <strong>Time:</strong> {{ request.time }}<br>
             <strong>Description:</strong> {{ request.description }}<br>
-            <div id="map-req-{{ loop.index }}" class="map"></div>
-
             {% if request.caretaker_name %}
-              <br>
               <strong>Caretaker:</strong>
               <button onclick="loadCaretakerDetails({{ request.caretaker_id }}, this)">
                 {{ request.caretaker_name }}
-              </button>
-              <div class="caretaker-details"></div>
-            {% endif %}
-            <br>
-            <strong>Status:</strong> {{ request.status|title }}
-          </div>
-        {% endfor %}
-        </div>
-      {% else %}
-        <p>No requests yet. Click “Request Help” to create one!</p>
-      {% endif %}
-    </section>
+             </button>
+             <div class="caretaker-details"></div>
+             <div id="map-req-{{ loop.index }}" class="map"></div>
+             <br>
+             {% endif %}
+             <strong>Status:</strong> {{ request.status|title }}
+         </div>
+         {% endfor %}
+         </div>
+       {% else %}
+        <p>No requests. Click the button to send one!</p>
+       {% endif %}
 
     <br>
 
     <!-- Completed Requests -->
     <section class="stripe">
       <h2 class="hero-title" style="font-size:2em;">📋 Your Completed Requests</h2>
-      {% if completed and completed|length > 0 %}
+      {% if accepted and accepted|length > 0 %}
         <div class="stripe-grid">
-        {% for complete in completed %}
+        {% for accept in accepted %}
           <div class="stripe-card">
-            <strong>{{ complete.title }}</strong><br>
-            {{ complete.category }}<br>
-            <strong>Time:</strong> {{ complete.time }}<br>
-            <strong>Description:</strong> {{ complete.description }}<br>
+            <strong>{{ accept.title }}</strong><br>
+            {{ accept.category }}<br>
+            <strong>Time:</strong> {{ accept.time }}<br>
+            <strong>Description:</strong> {{ accept.description }}<br>
             <div id="map-comp-{{ loop.index }}" class="map"></div>
 
-            {% if complete.caretaker_name %}
+            {% if accept.caretaker_name %}
               <br>
               <strong>Caretaker:</strong>
-              <button onclick="loadCaretakerDetails({{ complete.caretaker_id }}, this)">
-                {{ complete.caretaker_name }}
+              <button onclick="loadCaretakerDetails({{ accept.caretaker_id }}, this)">
+                {{ accept.caretaker_name }}
               </button>
               <div class="caretaker-details"></div>
             {% endif %}
             <br>
-            <strong>Status:</strong> {{ complete.status|title }}
+            <strong>Status:</strong> {{ accept.status|title }}
           </div>
         {% endfor %}
         </div>
       {% else %}
-        <p>You have no completed requests yet.</p>
+        <p>You have no accepted requests yet.</p>
       {% endif %}
     </section>
 
@@ -138,15 +134,15 @@
         {% endfor %}
 
         // Completed maps
-        {% for complete in completed %}
-          {% if complete.lat and complete.lng %}
-            const mapComp{{ loop.index }} = L.map('map-comp-{{ loop.index }}').setView([{{ complete.lat }}, {{ complete.lng }}], 15);
+        {% for accept in accepted %}
+          {% if accept.lat and accept.lng %}
+            const mapComp{{ loop.index }} = L.map('map-comp-{{ loop.index }}').setView([{{ accept.lat }}, {{ accept.lng }}], 15);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
               attribution: '&copy; OpenStreetMap contributors'
             }).addTo(mapComp{{ loop.index }});
-            L.marker([{{ complete.lat }}, {{ complete.lng }}])
+            L.marker([{{ accept.lat }}, {{ accept.lng }}])
               .addTo(mapComp{{ loop.index }})
-              .bindPopup("{{ complete.title }}")
+              .bindPopup("{{ accept.title }}")
               .openPopup();
           {% endif %}
         {% endfor %}
