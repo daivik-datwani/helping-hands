@@ -1,151 +1,140 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Helping Hands — Seniors Support</title>
-		<link rel="stylesheet" href="style.css">
-	</head>
-	<body>
-		<header class="site-header">
-			<div class="container nav-row">
-						<a href="{{ url_for('home') }}" class="logo" aria-label="Helping Hands home">
-					<span class="logo-mark">🤝</span>
-					<span class="logo-text">Helping Hands</span>
-				</a>
-
-				<button class="nav-toggle" aria-controls="primary-navigation" aria-expanded="false">
-					<span class="sr-only">Toggle navigation</span>
-					<svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path stroke="#fff" stroke-width="2" stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
-				</button>
-
-				<nav id="primary-navigation" class="primary-nav" aria-label="Primary navigation">
-					<ul class="nav-list">
-						<li><a href="#features">Features</a></li>
-						<li><a href="#how">How It Works</a></li>
-						<li><a href="#contact">Contact</a></li>
-					</ul>
-				</nav>
-
-				<div class="auth-actions">
-					  <a class="btn ghost" href="{{ url_for('login') }}">Login</a>
-					  <a class="btn primary" href="{{ url_for('signup') }}">Sign Up</a>
-				</div>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Helping Hands — Seniors Support</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<header class="site-header">
+		<div class="container nav-row">
+					<a href="{{ url_for('home') }}" class="logo" aria-label="Helping Hands home">
+				<span class="logo-mark">🤝</span>
+				<span class="logo-text">Helping Hands</span>
+			</a>
+			<button class="nav-toggle" aria-controls="primary-navigation" aria-expanded="false">
+				<span class="sr-only">Toggle navigation</span>
+				<svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path stroke="#fff" stroke-width="2" stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+			</button>
+			<nav id="primary-navigation" class="primary-nav" aria-label="Primary navigation">
+				<ul class="nav-list">
+					<li><a href="#features">Features</a></li>
+					<li><a href="#how">How It Works</a></li>
+					<li><a href="#contact">Contact</a></li>
+				</ul>
+			</nav>
+			<div class="auth-actions">
+				  <a class="btn ghost" href="{{ url_for('login') }}">Login</a>
+				  <a class="btn primary" href="{{ url_for('signup') }}">Sign Up</a>
 			</div>
-		</header>
-
-		<main>
-			<section class="hero">
-				<div class="container hero-grid">
-					<div class="hero-content">
-						<h1 class="hero-title">Seniors Thrive, We Arrive!</h1>
-						<p class="hero-tagline">Trusted companions, timely help, and everyday support to keep seniors safe, connected, and independent.</p>
-						<div class="hero-ctas">
-							<a class="btn cta-large" href="{{ url_for('signup') }}">Request Help Now</a>
-							<a class="btn secondary" href="#how">Learn How It Works</a>
+		</div>
+	</header>
+	<main>
+		<section class="hero">
+			<div class="container hero-grid">
+				<div class="hero-content">
+					<h1 class="hero-title">Seniors Thrive, We Arrive!</h1>
+					<p class="hero-tagline">Trusted companions, timely help, and everyday support to keep seniors safe, connected, and independent.</p>
+					<div class="hero-ctas">
+						<a class="btn cta-large" href="{{ url_for('signup') }}">Request Help Now</a>
+						<a class="btn secondary" href="#how">Learn How It Works</a>
+					</div>
+				</div>
+						
+						<div class="hero-visual" role="img" aria-label="Friendly helper assisting seniors">
+							<!-- Local hero image (place the attached image at frontend/assets/hero.jpg) -->
+							<img id="heroImage" src="assets/hero.jpg" alt="A smiling helper with a senior in a wheelchair at sunset"/>
 						</div>
-					</div>
-
-								
-								<div class="hero-visual" role="img" aria-label="Friendly helper assisting seniors">
-									<!-- Local hero image (place the attached image at frontend/assets/hero.jpg) -->
-									<img id="heroImage" src="assets/hero.jpg" alt="A smiling helper with a senior in a wheelchair at sunset"/>
-								</div>
-				</div>
-			</section>
-
-			<section id="features" class="stripe">
-				<div class="container stripe-grid">
-					<div class="stripe-card">
-						<h3>On-demand Assistance</h3>
-						<p>Quickly request vetted helpers for errands, companionship, or personal care.</p>
-					</div>
-					<div class="stripe-card">
-						<h3>Trusted Volunteers</h3>
-						<p>Background-checked volunteers and professionals you can count on.</p>
-					</div>
-					<div class="stripe-card">
-						<h3>Easy Scheduling</h3>
-						<p>Set recurring visits or one-time help with a few taps or calls.</p>
-					</div>
-				</div>
-			</section>
-
-			<section id="how" class="container how">
-				<h2>How It Works</h2>
-				<ol class="how-list">
-					<li><strong>Request:</strong> Tap "Request Help" and tell us what you need.</li>
-					<li><strong>Match:</strong> We connect you with a nearby, vetted helper.</li>
-					<li><strong>Assist:</strong> Help arrives — friendly, punctual, and professional.</li>
-				</ol>
-			</section>
-
-			<section id="contact" class="container contact">
-				<h2>Contact</h2>
-				<p>Questions or partnership inquiries? Email us at <a href="mailto:hello@helpinghands.example">hello@helpinghands.example</a>.</p>
-			</section>
-
-			<section id="request" class="container request-box">
-				<div class="request-inner">
-					<h2>Ready to get help?</h2>
-					<p>Our team is standing by to connect you with the support you need.</p>
-					<a class="btn cta-large" href="#">Request Help Now</a>
-				</div>
-			</section>
-		</main>
-
-		<footer class="site-footer">
-			<div class="container footer-row">
-				<p>© <span id="year"></span> Helping Hands — All rights reserved.</p>
-				<nav class="footer-nav" aria-label="Footer">
-					<a href="#privacy">Privacy</a>
-					<a href="#terms">Terms</a>
-				</nav>
 			</div>
-		</footer>
-
-		<script>
-			// set year
-			document.getElementById('year').textContent = new Date().getFullYear();
-
-			// nav toggle for mobile
-			const navToggle = document.querySelector('.nav-toggle');
-			const primaryNav = document.getElementById('primary-navigation');
-			if(navToggle){
-				navToggle.addEventListener('click', () => {
-					const expanded = navToggle.getAttribute('aria-expanded') === 'true' || false;
-					navToggle.setAttribute('aria-expanded', !expanded);
-					primaryNav.classList.toggle('open');
-				});
-			}
-
-			// close nav on link click (mobile)
-			document.querySelectorAll('#primary-navigation a').forEach(a => {
-				a.addEventListener('click', () => {
-					primaryNav.classList.remove('open');
-					const togg = document.querySelector('.nav-toggle');
-					if(togg) togg.setAttribute('aria-expanded', 'false');
-				});
+		</section>
+		<section id="features" class="stripe">
+			<div class="container stripe-grid">
+				<div class="stripe-card">
+					<h3>On-demand Assistance</h3>
+					<p>Quickly request vetted helpers for errands, companionship, or personal care.</p>
+				</div>
+				<div class="stripe-card">
+					<h3>Trusted Volunteers</h3>
+					<p>Background-checked volunteers and professionals you can count on.</p>
+				</div>
+				<div class="stripe-card">
+					<h3>Easy Scheduling</h3>
+					<p>Set recurring visits or one-time help with a few taps or calls.</p>
+				</div>
+			</div>
+		</section>
+		<section id="how" class="container how">
+			<h2>How It Works</h2>
+			<ol class="how-list">
+				<li><strong>Request:</strong> Tap "Request Help" and tell us what you need.</li>
+				<li><strong>Match:</strong> We connect you with a nearby, vetted helper.</li>
+				<li><strong>Assist:</strong> Help arrives — friendly, punctual, and professional.</li>
+			</ol>
+		</section>
+		<section id="contact" class="container contact">
+			<h2>Contact</h2>
+			<p>Questions or partnership inquiries? Email us at <a href="mailto:hello@helpinghands.example">hello@helpinghands.example</a>.</p>
+		</section>
+		<section id="request" class="container request-box">
+			<div class="request-inner">
+				<h2>Ready to get help?</h2>
+				<p>Our team is standing by to connect you with the support you need.</p>
+				<a class="btn cta-large" href="#">Request Help Now</a>
+			</div>
+		</section>
+	</main>
+	<footer class="site-footer">
+		<div class="container footer-grid">
+			<div>
+				<p class="footer-brand">🤝 <strong>Helping Hands</strong></p>
+				<p class="footer-tagline">Bringing care to seniors, one helping hand at a time.</p>
+			</div>
+			<nav aria-label="Footer links">
+				<a href="#privacy">Privacy</a>
+				<a href="#terms">Terms</a>
+			</nav>
+		</div>
+		<p class="footer-copy">© <span id="year"></span> Helping Hands. All rights reserved.</p>
+	</footer>
+	<script>
+		// set year
+		document.getElementById('year').textContent = new Date().getFullYear();
+		// nav toggle for mobile
+		const navToggle = document.querySelector('.nav-toggle');
+		const primaryNav = document.getElementById('primary-navigation');
+		if(navToggle){
+			navToggle.addEventListener('click', () => {
+				const expanded = navToggle.getAttribute('aria-expanded') === 'true' || false;
+				navToggle.setAttribute('aria-expanded', !expanded);
+				primaryNav.classList.toggle('open');
 			});
-
-					// sticky header: add scrolled class when page scrolls
-					const header = document.querySelector('.site-header');
-					const SCROLL_THRESHOLD = 24;
-					const onScroll = () => {
-						if(window.scrollY > SCROLL_THRESHOLD) header.classList.add('scrolled');
-						else header.classList.remove('scrolled');
-					};
-					window.addEventListener('scroll', onScroll, {passive:true});
-					// initialize
-					onScroll();
-
-							// hero image fallback: if local image fails to load, use the external Unsplash image
-							const heroImage = document.getElementById('heroImage');
-							if(heroImage){
-								heroImage.addEventListener('error', () => {
-									heroImage.src = 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=60';
-								});
-							}
-		</script>
-	</body>
+		}
+		// close nav on link click (mobile)
+		document.querySelectorAll('#primary-navigation a').forEach(a => {
+			a.addEventListener('click', () => {
+				primaryNav.classList.remove('open');
+				const togg = document.querySelector('.nav-toggle');
+				if(togg) togg.setAttribute('aria-expanded', 'false');
+			});
+		});
+			// sticky header: add scrolled class when page scrolls
+			const header = document.querySelector('.site-header');
+			const SCROLL_THRESHOLD = 24;
+			const onScroll = () => {
+				if(window.scrollY > SCROLL_THRESHOLD) header.classList.add('scrolled');
+				else header.classList.remove('scrolled');
+			};
+			window.addEventListener('scroll', onScroll, {passive:true});
+			// initialize
+			onScroll();
+				// hero image fallback: if local image fails to load, use the external Unsplash image
+				const heroImage = document.getElementById('heroImage');
+				if(heroImage){
+					heroImage.addEventListener('error', () => {
+						heroImage.src = 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=60';
+					});
+				}
+	</script>
+</body>
 </html>
