@@ -45,9 +45,9 @@
   <!-- CURRENT OPEN REQUESTS -->
   <section class="stripe">
     <h2 class="hero-title" style="font-size:2em;">🆕 Current Open Requests</h2>
-    {% if open_requests and open_requests|length > 0 %}
+    {% if requests and requests|length > 0 %}
       <div class="stripe-grid">
-        {% for req in open_requests %}
+        {% for req in requests %}
           <div class="stripe-card">
             <strong>{{ req.title }}</strong><br>
             {{ req.category }}<br>
@@ -75,9 +75,9 @@
   <!-- PENDING REQUESTS -->
   <section class="stripe">
     <h2 class="hero-title" style="font-size:2em;">⏳ Pending Requests</h2>
-    {% if pending and pending|length > 0 %}
+    {% if accepted and accepted|length > 0 %}
       <div class="stripe-grid">
-        {% for req in pending %}
+        {% for req in accepted %}
           <div class="stripe-card">
             <strong>{{ req.title }}</strong><br>
             {{ req.category }}<br>
@@ -103,32 +103,6 @@
 
   <br>
 
-  <!-- COMPLETED REQUESTS -->
-  <section class="stripe">
-    <h2 class="hero-title" style="font-size:2em;">✅ Completed Requests</h2>
-    {% if completed and completed|length > 0 %}
-      <div class="stripe-grid">
-        {% for req in completed %}
-          <div class="stripe-card">
-            <strong>{{ req.title }}</strong><br>
-            {{ req.category }}<br>
-            <strong>Time:</strong> {{ req.time }}<br>
-            <strong>Description:</strong> {{ req.description }}<br>
-            <div id="map-completed-{{ loop.index }}" class="map"></div>
-            {% if req.senior_name %}
-              <br>
-              <strong>Senior:</strong> {{ req.senior_name }}<br>
-            {% endif %}
-            <br>
-            <strong>Status:</strong> {{ req.status|title }}
-          </div>
-        {% endfor %}
-      </div>
-    {% else %}
-      <p>No completed requests yet.</p>
-    {% endif %}
-  </section>
-
   <div style="text-align:right;">
     <a href="/logout" class="btn primary logout-button">Logout</a>
   </div>
@@ -144,7 +118,7 @@
       }
 
       // Maps for open requests
-      {% for req in open_requests %}
+      {% for req in requests %}
         {% if req.lat and req.lng %}
           const mapOpen{{ loop.index }} = L.map('map-open-{{ loop.index }}').setView([{{ req.lat }}, {{ req.lng }}], 15);
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -155,7 +129,7 @@
       {% endfor %}
 
       // Maps for pending requests
-      {% for req in pending %}
+      {% for req in accepted %}
         {% if req.lat and req.lng %}
           const mapPending{{ loop.index }} = L.map('map-pending-{{ loop.index }}').setView([{{ req.lat }}, {{ req.lng }}], 15);
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -164,18 +138,6 @@
           L.marker([{{ req.lat }}, {{ req.lng }}]).addTo(mapPending{{ loop.index }}).bindPopup("{{ req.title }}");
         {% endif %}
       {% endfor %}
-
-      // Maps for completed requests
-      {% for req in completed %}
-        {% if req.lat and req.lng %}
-          const mapCompleted{{ loop.index }} = L.map('map-completed-{{ loop.index }}').setView([{{ req.lat }}, {{ req.lng }}], 15);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-          }).addTo(mapCompleted{{ loop.index }});
-          L.marker([{{ req.lat }}, {{ req.lng }}]).addTo(mapCompleted{{ loop.index }}).bindPopup("{{ req.title }}");
-        {% endif %}
-      {% endfor %}
-    });
   </script>
 </div>
 </body>
