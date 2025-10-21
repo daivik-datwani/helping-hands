@@ -171,6 +171,7 @@ label, input, .btn, .logo-text, .nav-list a { font-size: 1em; }
 .site-footer{padding:28px 0;background:transparent;}
 .footer-row{display:flex;justify-content:space-between;align-items:center;color:var(--muted);}
 .footer-nav a{margin-left:12px;color:var(--muted);text-decoration:none;}
+<<<<<<< HEAD
 
 /* ============================================================
    REQUEST HELP PAGE (only this section updated)
@@ -406,3 +407,5 @@ form {
     box-shadow: 0 4px 18px rgba(43,72,162,0.07);
     font-family: "Segoe UI", "Inter", Arial, sans-serif;
 }
+=======
+>>>>>>> parent of dc81d57 (rating)
