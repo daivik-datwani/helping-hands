@@ -1,0 +1,147 @@
+[33m8005242[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m im ok
+[33ma914cdd[m fix
+[33m57a3f6e[m fixing
+[33m77d581a[m fix
+[33m620b8c0[m yes
+[33m6065e7b[m Merge branch 'main' of https://github.com/pingaarav/helping-hands
+[33m76606d5[m t
+[33m757316b[m working
+[33medd5276[m still working
+[33m02ac64a[m colour
+[33mfbef4f7[m Merge branch 'main' of https://github.com/pingaarav/helping-hands
+[33m9dd6627[m three symbols
+[33m7ba85da[m Tagline
+[33m7478631[m fix
+[33mde03c97[m fix aarav
+[33mb2cbb61[m I dont know
+[33md859d39[m fix dashboard caretaker
+[33mc64bbe8[m smth
+[33m8278a9b[m added time input to request_help.html
+[33maf3fdb9[m get rid of overwritten yucky blue css
+[33m39fb18b[m Merge branch 'main' of https://github.com/pingaarav/senior-care-app
+[33m138fde1[m Improve Request Help page styling and layout
+[33m4828689[m Revert "rating"
+[33m332f325[m Merge branch 'main' of https://github.com/pingaarav/senior-care-app
+[33m9494676[m Merge branch 'main' of https://github.com/pingaarav/senior-care-app
+[33mdc81d57[m rating
+[33m79a57c8[m Improve Request Help page styling and layout
+[33mea595fa[m feedback go gas gas gas
+[33ma0008fb[m lock html
+[33m4d33e78[m lock in
+[33ma485e5d[m yes again durksi
+[33m050b137[m bismillah wa rahmtillah
+[33ma3706d0[m Fix: restore script tags and front-end CSS
+[33m9197b3e[m Fix hero image responsive design for desktop and mobile
+[33m962ff14[m U happy now ??
+[33mde96f51[m Test commit by Comet Assistant
+[33m333d408[m Merge branch 'main' of https://github.com/pingaarav/helping-hands
+[33md0e5778[m Fix loop of request help button
+[33me3ddc3b[m Prevent too big year that breaks everything
+[33mf7a3d2f[m fix feedback issue i realized what it was just someone check now
+[33m3fb6bb3[m tuff stuff here vro
+[33mce14f38[m fix routes.py and update functions
+[33m93dfccb[m Merge branch 'main' of https://github.com/pingaarav/helping-hands
+[33m3ad8e4a[m feedback works now yay
+[33m79a22d4[m Resolved merge conflicts
+[33m5b22c1d[m Merge branch 'main' of https://github.com/pingaarav/senior-care-app git add backend/routes.py
+[33m0eccf5a[m feedback
+[33m9c9c30c[m fix: add location requirement for caretakers and fix dashboard SQL queries
+[33mf1a03ca[m I forgor
+[33mc33d34a[m added some <br>
+[33m85c6edd[m Fix time
+[33mbdfde74[m Add location indicator w/o map in request boxes
+[33m1864b90[m Add senior requests
+[33m65764bb[m Code done button
+[33mb0f090d[m smth for dev.db
+[33mb1c384d[m Merge correctly
+[33m2a6b56d[m Merge branch 'main' of https://github.com/pingaarav/helping-hands
+[33m0fed51b[m Allow accept request
+[33me996ff7[m fixing date time selector
+[33md45dba4[m styling
+[33m66281da[m Updated routes, added login/location decorators, fixed set_location HTML, updated models
+[33m9e1b691[m Merge
+[33md877c01[m Merge branch 'main' of https://github.com/pingaarav/helping-hands
+[33mf4469ad[m Fix boxes description thing of caretakers
+[33mc7196b9[m Revert "sabah al khair"
+[33m9e1a7c1[m trying smth
+[33m613ef8f[m sabah al khair
+[33m76fa946[m image movement bismillah
+[33mc560215[m css movement bismillah
+[33ma843cf2[m trying to host
+[33mf7898c0[m dshabaord fixing
+[33m8054d29[m yes
+[33m74f94b7[m Make requests show up on caretaker dashboard
+[33ma653aaf[m Merge branch 'main' of https://github.com/pingaarav/helping-hands
+[33m824d6a2[m shaddow removal
+[33m58080d9[m Merge branch 'main' of https://github.com/pingaarav/helping-hands
+[33ma5d8dc4[m put html in the caretaker page
+[33m261d165[m lock in
+[33m9026a4d[m Merge branch 'main' of https://github.com/pingaarav/helping-hands
+[33m39e414b[m Made request help button
+[33m165bf6a[m Merge branch 'main' of https://github.com/pingaarav/helping-hands
+[33m665c5bf[m Merge branch 'main' of https://github.com/pingaarav/helping-hands
+[33m46ef4e4[m Make caretaker dashboard
+[33mf7cd57f[m yes again
+[33mdf506d1[m Merge branch 'main' of https://github.com/pingaarav/helping-hands
+[33mf05b048[m yes
+[33m79dea66[m Add Logout
+[33m9459d3b[m Merge branch 'main' of https://github.com/pingaarav/helping-hands
+[33m293fd6b[m its ok now ig
+[33m4ec0297[m Add request help page for seniors
+[33mff6a7f5[m unify dash
+[33ma379b35[m nothing
+[33ma4acf08[m remove react
+[33m1b3a955[m Merge branch 'main' of https://github.com/pingaarav/helping-hands
+[33md6aae11[m Update dashboard.html
+[33m7843f00[m Refactor SeniorDashboard from React to Jinja2 template for Flask
+[33m9d24ecf[m Merge branch 'main' of https://github.com/pingaarav/senior-care-app
+[33m997725c[m Fix signup duplicate email issue and make /users route safe
+[33m675bd03[m Add comprehensive CSS styling for SeniorDashboard
+[33mff05878[m Add senior-friendly dashboard component with React
+[33mf33c7ed[m Add caregiver availability check feature to backend
+[33mebb3dcb[m Merge actual merge of merge
+[33mef77cac[m Merge branch 'main' of https://github.com/pingaarav/helping-hands
+[33m15fb227[m Allow login via phone
+[33m72b9047[m Use my own files, overwrite everything
+[33mf140f30[m fixing css sizes
+[33m16b0a48[m Merge branch 'main' of https://github.com/pingaarav/helping-hands
+[33m9d82555[m somecssstuff
+[33m68097fa[m Make login verify username and password
+[33m9f50451[m Added working signup, login, and user routes
+[33maf422ce[m Fix caretaker signup & db
+[33mbedf045[m Merge branch 'main' of https://github.com/pingaarav/helping-hands
+[33me505abd[m Add phone and email in db and signup
+[33m53de795[m check image
+[33m845e3f6[m yea
+[33mfdfd135[m dev.db
+[33mc79cc7d[m Merge branch 'main' of https://github.com/pingaarav/helping-hands
+[33m2a79380[m Frontend +diff login signups
+[33m84fd884[m Update README.md
+[33mf218198[m Routing
+[33m247f201[m Fix 404 errors
+[33ma4fa4df[m Fix HTML structure and cleanup
+[33mfed0afe[m login plus signup styling
+[33me5688d6[m make it look like stripe
+[33mc087458[m html strcuture
+[33m38fdcd7[m css
+[33me703682[m Merge branch 'main' of https://github.com/pingaarav/helping-hands
+[33m0b86325[m index sync
+[33mc99f287[m Fix quote marks
+[33m45e5fe9[m Rename database
+[33m645a674[m Merge branch 'main' of https://github.com/pingaarav/helping-hands
+[33mcbb3932[m Create signup and login pages, put links in index and form in signup, make route.py accept form data
+[33m7b2db6d[m Rename backend/models/thedatabaseidk.py to helpinghandsdatabase.py
+[33m5ea8894[m Updated backend: models, routes, app factory
+[33mb8181bf[m Made Senior SQL
+[33m0ef1a77[m Added a SQL table for the Seniors
+[33m208e3c0[m Update README.md
+[33mc41de67[m made app.py, __init__.py and routes.py.
+[33m4fb7e77[m Add index.html with initial content
+[33me0daff3[m Update style.css
+[33me45be0a[m Update idkhowtonamethings.py
+[33m8c0f921[m Delete Frontend
+[33m6e3d833[m I also made file hehe
+[33me2bfbe3[m Create Frontend
+[33m0006dc1[m i made file :)
+[33md5b7dc3[m Create README.md
+[33m23eba7e[m Initial commit
